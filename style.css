@@ -69,11 +69,32 @@ body {
     box-shadow: 0 10px 50px rgba(0, 0, 0, 0.85);
 }
 
-/* Section 2: Customize Character & Garage (1024:570) */
+/* Section 2: What You Want To Be (1024:217) */
+.section2-section {
+    background-color: #0c0d10;
+}
+
+.section2-wrapper {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1024 / 217;
+    max-height: 100vh;
+    max-width: calc(100vh * (1024 / 217));
+    background-color: #0c0d10;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 10px 50px rgba(0, 0, 0, 0.85);
+}
+
+/* Section 3: Customize Character & Garage (1024:570) */
+.section3-section,
 .scroll-section {
     background-color: #0c0d10;
 }
 
+.section3-wrapper,
 .scroll-wrapper {
     position: relative;
     width: 100%;
@@ -284,7 +305,26 @@ body {
     height: 7.0%;
 }
 
-/* Section 2: CREATE CHARACTER Button */
+/* Section 2: CREATE ONESELF Button */
+.hotspot-btn.btn-create-oneself {
+    left: 16.8%;
+    top: 32.0%;
+    width: 12.8%;
+    height: 16.0%;
+    border-radius: 4px;
+}
+
+.hotspot-btn.btn-create-oneself:hover {
+    background: rgba(255, 255, 255, 0.22);
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.75), inset 0 0 10px rgba(255, 255, 255, 0.4);
+    transform: translateY(-1px);
+}
+
+.hotspot-btn.btn-create-oneself:active {
+    transform: translateY(1px);
+}
+
+/* Section 3: CREATE CHARACTER Button */
 .hotspot-btn.btn-create-character {
     left: 54.0%;
     top: 35.8%;
@@ -819,6 +859,8 @@ body {
     }
 
     .hero-wrapper,
+    .section2-wrapper,
+    .section3-wrapper,
     .scroll-wrapper {
         width: 100%;
         max-width: 100%;

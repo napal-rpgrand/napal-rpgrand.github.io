@@ -182,7 +182,8 @@ createCharacterBtn?.addEventListener("click", (e) => {
     openLoginModal();
 });
 
-mobileCreateCharBtn?.addEventListener("click", (e) => {
+const createOneselfBtn = document.getElementById("createOneselfBtn");
+createOneselfBtn?.addEventListener("click", (e) => {
     e.stopPropagation();
     openLoginModal();
 });
