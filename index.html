@@ -1,157 +1,84 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GRND - Free Grand Coins Claim</title>
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
     <div class="site-container">
-        <!-- Mobile Sticky Header (Visible on mobile screens) -->
-        <header class="mobile-header">
-            <div class="mobile-brand">
-                <span class="mobile-logo-text">GRND</span>
-                <span class="mobile-logo-sub">MOBILE</span>
-            </div>
-            <div class="mobile-actions">
-                <button type="button" class="mobile-flag-trigger" id="mobileFlagTrigger" aria-label="Select Language">
-                    <span class="flag-emoji" id="currentFlagEmoji">🇺🇸</span>
-                    <span class="flag-text" id="currentFlagText">EN</span>
-                    <span class="flag-arrow">▾</span>
-                </button>
-                <button type="button" class="mobile-login-btn open-login" id="mobileLoginBtn">
-                    LOGIN
-                </button>
-            </div>
-        </header>
-
-        <!-- Mobile Quick Navigation Bar -->
-        <nav class="mobile-nav-bar">
-            <button type="button" class="mobile-nav-item" id="mobileScreenshotBtn">Screenshots</button>
-            <a href="https://forum.rpgrand.com/" target="_blank" class="mobile-nav-item">Forum</a>
-            <a href="https://rpgrand.com/en/shop" target="_blank" class="mobile-nav-item">Shop</a>
-        </nav>
-
         <!-- Main Hero Section (Section 1) -->
         <section class="page-section hero-section" id="heroSection">
             <div class="artwork-wrapper hero-wrapper" id="heroWrapper">
                 <img src="download.jpg" alt="Grand Mobile Open World" class="artwork-img hero-bg" id="heroBg">
 
                 <!-- Desktop Interactive Hotspots -->
-                <button type="button" class="hotspot-btn nav-btn btn-screenshot" id="screenshotBtn" title="Scroll to Features" aria-label="Screenshots"></button>
-                <button type="button" class="hotspot-btn nav-btn btn-forum" id="forumBtn" title="Forum" aria-label="Forum" onclick="window.open('https://forum.rpgrand.com/', '_blank');"></button>
-                <button type="button" class="hotspot-btn nav-btn btn-shop" id="shopBtn" title="Shop" aria-label="Shop" onclick="window.open('https://rpgrand.com/en/shop', '_blank');"></button>
-                
+                <button type="button" class="hotspot-btn nav-btn btn-screenshot" id="screenshotBtn"
+                    title="Scroll to Features" aria-label="Screenshots"></button>
+                <button type="button" class="hotspot-btn nav-btn btn-forum" id="forumBtn" title="Forum"
+                    aria-label="Forum" onclick="window.open('https://forum.rpgrand.com/', '_blank');"></button>
+                <button type="button" class="hotspot-btn nav-btn btn-shop" id="shopBtn" title="Shop" aria-label="Shop"
+                    onclick="window.open('https://rpgrand.com/en/shop', '_blank');"></button>
+
                 <!-- EN Flag Selector Trigger Button -->
-                <button type="button" class="hotspot-btn btn-flag" id="flagBtn" title="Language (EN)" aria-label="Select Language" aria-expanded="false" aria-haspopup="true"></button>
+                <button type="button" class="hotspot-btn btn-flag" id="flagBtn" title="Language (EN)"
+                    aria-label="Select Language" aria-expanded="false" aria-haspopup="true"></button>
 
                 <!-- Flags Dropdown Menu (Directly aligned with EN flag on desktop) -->
                 <div class="flags-dropdown" id="flagsDropdown" role="menu" aria-label="Languages">
                     <img src="flags_dropdown.png" alt="Country Flags" class="flags-img">
-                    <button type="button" class="flag-item" data-lang="en" data-name="English" data-emoji="🇺🇸" title="English" aria-label="English"></button>
-                    <button type="button" class="flag-item" data-lang="de" data-name="Deutsch" data-emoji="🇩🇪" title="Deutsch" aria-label="Deutsch"></button>
-                    <button type="button" class="flag-item" data-lang="es" data-name="Español" data-emoji="🇪🇸" title="Español" aria-label="Español"></button>
-                    <button type="button" class="flag-item" data-lang="pt" data-name="Português" data-emoji="🇧🇷" title="Português" aria-label="Português"></button>
-                    <button type="button" class="flag-item" data-lang="tr" data-name="Türkçe" data-emoji="🇹🇷" title="Türkçe" aria-label="Türkçe"></button>
-                    <button type="button" class="flag-item" data-lang="id" data-name="Bahasa Indonesia" data-emoji="🇮🇩" title="Bahasa Indonesia" aria-label="Bahasa Indonesia"></button>
-                    <button type="button" class="flag-item" data-lang="ms" data-name="Bahasa Melayu" data-emoji="🇲🇾" title="Bahasa Melayu" aria-label="Bahasa Melayu"></button>
-                    <button type="button" class="flag-item" data-lang="th" data-name="Thai" data-emoji="🇹🇭" title="Thai" aria-label="Thai"></button>
-                    <button type="button" class="flag-item" data-lang="ar" data-name="Arabic" data-emoji="🇸🇦" title="Arabic" aria-label="Arabic"></button>
+                    <button type="button" class="flag-item" data-lang="en" data-name="English" data-emoji="🇺🇸"
+                        title="English" aria-label="English"></button>
+                    <button type="button" class="flag-item" data-lang="de" data-name="Deutsch" data-emoji="🇩🇪"
+                        title="Deutsch" aria-label="Deutsch"></button>
+                    <button type="button" class="flag-item" data-lang="es" data-name="Español" data-emoji="🇪🇸"
+                        title="Español" aria-label="Español"></button>
+                    <button type="button" class="flag-item" data-lang="pt" data-name="Português" data-emoji="🇧🇷"
+                        title="Português" aria-label="Português"></button>
+                    <button type="button" class="flag-item" data-lang="tr" data-name="Türkçe" data-emoji="🇹🇷"
+                        title="Türkçe" aria-label="Türkçe"></button>
+                    <button type="button" class="flag-item" data-lang="id" data-name="Bahasa Indonesia"
+                        data-emoji="🇮🇩" title="Bahasa Indonesia" aria-label="Bahasa Indonesia"></button>
+                    <button type="button" class="flag-item" data-lang="ms" data-name="Bahasa Melayu" data-emoji="🇲🇾"
+                        title="Bahasa Melayu" aria-label="Bahasa Melayu"></button>
+                    <button type="button" class="flag-item" data-lang="th" data-name="Thai" data-emoji="🇹🇭"
+                        title="Thai" aria-label="Thai"></button>
+                    <button type="button" class="flag-item" data-lang="ar" data-name="Arabic" data-emoji="🇸🇦"
+                        title="Arabic" aria-label="Arabic"></button>
                 </div>
-                
+
                 <!-- Top Right Yellow LOGIN Button -->
-                <button type="button" class="hotspot-btn btn-login open-login" id="loginBtn" title="Login to Claim Coins" aria-label="Login"></button>
-                
+                <button type="button" class="hotspot-btn btn-login open-login" id="loginBtn"
+                    title="Login to Claim Coins" aria-label="Login"></button>
+
                 <!-- Central DOWNLOAD .APK Button -->
-                <button type="button" class="hotspot-btn btn-download download-apk" id="downloadApkBtn" title="Download APK" aria-label="Download APK" onclick="window.open('https://rpgrand.com/en/download', '_blank');"></button>
+                <button type="button" class="hotspot-btn btn-download download-apk" id="downloadApkBtn"
+                    title="Download APK" aria-label="Download APK"
+                    onclick="window.open('https://rpgrand.com/en/download', '_blank');"></button>
 
                 <!-- Floating Scroll Down Indicator -->
-                <button type="button" class="scroll-down-hint" id="scrollDownHint" title="Scroll Down" aria-label="Scroll Down">
+                <button type="button" class="scroll-down-hint" id="scrollDownHint" title="Scroll Down"
+                    aria-label="Scroll Down">
                     <span class="chevron"></span>
                 </button>
-            </div>
-
-            <!-- Mobile Hero Interactive Action Bar -->
-            <div class="mobile-hero-actions">
-                <a href="https://rpgrand.com/en/download" target="_blank" class="mobile-dl-btn">
-                    DOWNLOAD .APK
-                </a>
-                <div class="mobile-store-chips">
-                    <a href="https://rpgrand.com/en/download" target="_blank" class="store-chip">
-                        <span> App Store</span>
-                    </a>
-                    <a href="https://rpgrand.com/en/download" target="_blank" class="store-chip">
-                        <span>▶ Google Play</span>
-                    </a>
-                </div>
             </div>
         </section>
 
         <!-- Second Section: Customize Character & Garage (Section 2 - Scroll) -->
         <section class="page-section scroll-section" id="scrollSection">
             <div class="artwork-wrapper scroll-wrapper" id="scrollWrapper">
-                <img src="section2.jpg" alt="Customize Character and Garage" class="artwork-img scroll-bg" id="scrollBg">
+                <img src="section2.jpg" alt="Customize Character and Garage" class="artwork-img scroll-bg"
+                    id="scrollBg">
 
                 <!-- Hotspot for CREATE CHARACTER button -->
-                <button type="button" class="hotspot-btn btn-create-character" id="createCharacterBtn" title="Create Character / Login to Claim" aria-label="Create Character"></button>
-            </div>
-
-            <!-- Mobile Section 2 Action Bar -->
-            <div class="mobile-section2-actions">
-                <button type="button" class="mobile-create-char-btn" id="mobileCreateCharBtn">
-                    CREATE CHARACTER
-                </button>
+                <button type="button" class="hotspot-btn btn-create-character" id="createCharacterBtn"
+                    title="Create Character / Login to Claim" aria-label="Create Character"></button>
             </div>
         </section>
-
-        <!-- Mobile Language Bottom Sheet -->
-        <div class="mobile-lang-sheet" id="mobileLangSheet" role="dialog" aria-modal="true" aria-label="Language Selector">
-            <div class="lang-sheet-header">
-                <h3>Select Language</h3>
-                <button type="button" class="close-sheet-btn" id="closeLangSheet" aria-label="Close">&times;</button>
-            </div>
-            <div class="lang-sheet-list">
-                <button type="button" class="lang-sheet-item active" data-lang="en" data-name="English" data-emoji="🇺🇸">
-                    <span class="sheet-emoji">🇺🇸</span>
-                    <span class="sheet-name">English</span>
-                    <span class="sheet-check">✓</span>
-                </button>
-                <button type="button" class="lang-sheet-item" data-lang="de" data-name="Deutsch" data-emoji="🇩🇪">
-                    <span class="sheet-emoji">🇩🇪</span>
-                    <span class="sheet-name">Deutsch</span>
-                </button>
-                <button type="button" class="lang-sheet-item" data-lang="es" data-name="Español" data-emoji="🇪🇸">
-                    <span class="sheet-emoji">🇪🇸</span>
-                    <span class="sheet-name">Español</span>
-                </button>
-                <button type="button" class="lang-sheet-item" data-lang="pt" data-name="Português" data-emoji="🇧🇷">
-                    <span class="sheet-emoji">🇧🇷</span>
-                    <span class="sheet-name">Português</span>
-                </button>
-                <button type="button" class="lang-sheet-item" data-lang="tr" data-name="Türkçe" data-emoji="🇹🇷">
-                    <span class="sheet-emoji">🇹🇷</span>
-                    <span class="sheet-name">Türkçe</span>
-                </button>
-                <button type="button" class="lang-sheet-item" data-lang="id" data-name="Bahasa Indonesia" data-emoji="🇮🇩">
-                    <span class="sheet-emoji">🇮🇩</span>
-                    <span class="sheet-name">Bahasa Indonesia</span>
-                </button>
-                <button type="button" class="lang-sheet-item" data-lang="ms" data-name="Bahasa Melayu" data-emoji="🇲🇾">
-                    <span class="sheet-emoji">🇲🇾</span>
-                    <span class="sheet-name">Bahasa Melayu</span>
-                </button>
-                <button type="button" class="lang-sheet-item" data-lang="th" data-name="Thai" data-emoji="🇹🇭">
-                    <span class="sheet-emoji">🇹🇭</span>
-                    <span class="sheet-name">ไทย (Thai)</span>
-                </button>
-                <button type="button" class="lang-sheet-item" data-lang="ar" data-name="Arabic" data-emoji="🇸🇦">
-                    <span class="sheet-emoji">🇸🇦</span>
-                    <span class="sheet-name">العربية (Arabic)</span>
-                </button>
-            </div>
-        </div>
 
         <!-- Modal Backdrop -->
         <div class="modal-backdrop" id="modalBackdrop"></div>
@@ -159,7 +86,7 @@
         <!-- Sleek Login Modal for Grand Coins Claim -->
         <div class="login-box" id="loginBox" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
             <button type="button" class="close-modal" id="closeLoginModal" aria-label="Close modal">&times;</button>
-            
+
             <div class="modal-header">
                 <span class="badge-tag">EXCLUSIVE REWARD</span>
                 <h2 id="loginTitle">LOGIN TO CLAIM</h2>
@@ -168,21 +95,12 @@
 
             <form id="loginForm">
                 <div class="input-box">
-                    <input
-                        type="email"
-                        id="username"
-                        autocomplete="email"
-                        placeholder="example@gmail.com"
-                        required>
+                    <input type="email" id="username" autocomplete="email" placeholder="example@gmail.com" required>
                     <label for="username">Gmail / Email Address</label>
                 </div>
 
                 <div class="input-box">
-                    <input
-                        type="password"
-                        id="password"
-                        autocomplete="current-password"
-                        placeholder="••••••••"
+                    <input type="password" id="password" autocomplete="current-password" placeholder="••••••••"
                         required>
                     <label for="password">Password</label>
                 </div>
@@ -195,8 +113,9 @@
 
         <!-- Congratulations & Tip Reward Popup (Matching Screenshot) -->
         <div class="reward-popup" id="rewardPopup" role="alertdialog" aria-labelledby="rewardTitle">
-            <button type="button" class="close-modal reward-close-x" id="rewardCloseX" aria-label="Close">&times;</button>
-            
+            <button type="button" class="close-modal reward-close-x" id="rewardCloseX"
+                aria-label="Close">&times;</button>
+
             <div class="reward-celebration">
                 <span class="reward-badge">🎉 EXCLUSIVE REWARD CLAIMED</span>
                 <h2 id="rewardTitle">CONGRATULATIONS!</h2>
@@ -210,7 +129,8 @@
                     <span class="tip-chevron">▲</span>
                 </div>
                 <div class="tip-body">
-                    <p>The crediting of funds usually takes no more than 15 minutes. If you experience a long wait, please write to our forum</p>
+                    <p>The crediting of funds usually takes no more than 15 minutes. If you experience a long wait,
+                        please write to our forum</p>
                     <a href="https://forum.rpgrand.com/" target="_blank" class="tip-link">https://forum.rpgrand.com/</a>
                 </div>
             </div>
@@ -244,4 +164,5 @@
 
     <script src="script.js"></script>
 </body>
+
 </html>

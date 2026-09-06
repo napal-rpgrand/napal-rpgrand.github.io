@@ -794,18 +794,7 @@ body {
 }
 
 /* =======================================================
-   Mobile Components Defaults (Hidden on Desktop)
-   ======================================================= */
-.mobile-header,
-.mobile-nav-bar,
-.mobile-hero-actions,
-.mobile-section2-actions,
-.mobile-lang-sheet {
-    display: none;
-}
-
-/* =======================================================
-   Mobile Chrome & Touch Device Responsiveness (<= 768px)
+   Responsive Touch & Modal Optimization (<= 768px)
    ======================================================= */
 @media screen and (max-width: 768px) {
     body {
@@ -819,129 +808,30 @@ body {
     .site-container {
         width: 100%;
         max-width: 100%;
-        min-height: auto;
+        margin: 0;
+        padding: 0;
     }
 
-    /* Hide mobile-only duplicate controls — keep desktop hotspots on artwork */
-    .mobile-header,
-    .mobile-nav-bar,
-    .mobile-hero-actions,
-    .mobile-section2-actions {
-        display: none !important;
-    }
-
-    /* Section Aspect & Dimensions on Mobile */
     .page-section {
-        flex-direction: column;
+        width: 100%;
+        margin: 0;
+        padding: 0;
     }
 
     .hero-wrapper,
     .scroll-wrapper {
         width: 100%;
         max-width: 100%;
-        aspect-ratio: auto;
-        max-height: none;
-        border-radius: 0;
+        margin: 0;
+        padding: 0;
         box-shadow: none;
     }
 
     .artwork-img {
         width: 100%;
-        height: auto;
-        object-fit: cover;
-    }
-
-
-    /* Mobile Language Bottom Sheet */
-    .mobile-lang-sheet {
-        display: flex;
-        flex-direction: column;
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        background: #14171f;
-        border-top: 2px solid #ffd000;
-        border-radius: 20px 20px 0 0;
-        padding: 20px 18px 32px;
-        z-index: 1002;
-        max-height: 82vh;
-        box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.9);
-        transform: translateY(100%);
-        transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-
-    .mobile-lang-sheet.show {
-        transform: translateY(0);
-    }
-
-    .lang-sheet-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding-bottom: 12px;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-        margin-bottom: 12px;
-    }
-
-    .lang-sheet-header h3 {
-        font-size: 17px;
-        font-weight: 800;
-        color: #ffd000;
-        letter-spacing: 0.5px;
-    }
-
-    .close-sheet-btn {
-        background: transparent;
-        border: none;
-        color: #8e94a5;
-        font-size: 26px;
-        cursor: pointer;
-        padding: 4px;
-    }
-
-    .lang-sheet-list {
-        display: flex;
-        flex-direction: column;
-        gap: 6px;
-        overflow-y: auto;
-        -webkit-overflow-scrolling: touch;
-        padding-bottom: 10px;
-    }
-
-    .lang-sheet-item {
-        display: flex;
-        align-items: center;
-        padding: 12px 14px;
-        background: rgba(255, 255, 255, 0.04);
-        border: 1px solid rgba(255, 255, 255, 0.06);
-        border-radius: 10px;
-        color: #ffffff;
-        font-size: 15px;
-        font-weight: 700;
-        cursor: pointer;
-        gap: 12px;
-        text-align: left;
-    }
-
-    .lang-sheet-item.active {
-        background: rgba(255, 208, 0, 0.14);
-        border-color: #ffd000;
-        color: #ffd000;
-    }
-
-    .sheet-emoji {
-        font-size: 20px;
-    }
-
-    .sheet-name {
-        flex: 1;
-    }
-
-    .sheet-check {
-        font-size: 16px;
-        font-weight: 900;
-        color: #ffd000;
+        height: 100%;
+        object-fit: contain;
+        display: block;
     }
 
     /* Modals Responsive Handling for Mobile Chrome */
@@ -1023,3 +913,4 @@ body {
         text-align: center;
     }
 }
+
