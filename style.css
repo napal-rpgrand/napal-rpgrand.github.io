@@ -839,14 +839,16 @@ body {
     .scroll-wrapper {
         width: 100%;
         max-width: 100%;
-        aspect-ratio: 1024 / 550;
+        aspect-ratio: auto;
         max-height: none;
         border-radius: 0;
         box-shadow: none;
     }
 
-    .scroll-wrapper {
-        aspect-ratio: 1024 / 570;
+    .artwork-img {
+        width: 100%;
+        height: auto;
+        object-fit: cover;
     }
 
 
