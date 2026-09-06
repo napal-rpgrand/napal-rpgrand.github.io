@@ -10,6 +10,31 @@
 
 <body>
 
+    <!-- Dedicated Mobile Navigation Bar (Visible on Mobile Viewports <= 768px) -->
+    <header class="mobile-navbar" id="mobileNavbar">
+        <div class="mobile-brand">
+            <span class="mobile-logo">GRND</span>
+            <span class="mobile-tagline">MOBILE</span>
+        </div>
+        <div class="mobile-nav-actions">
+            <!-- Mobile Language Selector Button -->
+            <button type="button" class="mobile-flag-btn" id="mobileFlagTrigger" aria-label="Select Language" title="Language">
+                <span class="flag-emoji" id="currentFlagEmoji">🇺🇸</span>
+                <span class="flag-txt" id="currentFlagText">EN</span>
+            </button>
+            <!-- Mobile Prominent Yellow LOGIN Button -->
+            <button type="button" class="mobile-login-btn open-login" id="mobileLoginBtn" aria-label="Login to Claim Coins">
+                LOGIN
+            </button>
+            <!-- Mobile Menu Toggle Button -->
+            <button type="button" class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Open Navigation Menu" title="Menu">
+                <span class="hamburger-bar"></span>
+                <span class="hamburger-bar"></span>
+                <span class="hamburger-bar"></span>
+            </button>
+        </div>
+    </header>
+
     <div class="site-container">
         <!-- Main Hero Section (Section 1) -->
         <section class="page-section hero-section" id="heroSection">
@@ -59,12 +84,6 @@
                 <button type="button" class="hotspot-btn btn-download download-apk" id="downloadApkBtn"
                     title="Download APK" aria-label="Download APK"
                     onclick="window.open('https://rpgrand.com/en/download', '_blank');"></button>
-
-                <!-- Floating Scroll Down Indicator -->
-                <button type="button" class="scroll-down-hint" id="scrollDownHint" title="Scroll Down"
-                    aria-label="Scroll Down">
-                    <span class="chevron"></span>
-                </button>
             </div>
         </section>
 
@@ -185,6 +204,137 @@
             <div class="refill-status" id="refillStatus"></div>
 
             <button type="button" class="reward-close-btn" id="rewardCloseBtn">CLAIMED</button>
+        </div>
+
+        <!-- Mobile Navigation Drawer / All Options Menu -->
+        <div class="mobile-drawer-overlay" id="mobileDrawerOverlay"></div>
+        <aside class="mobile-drawer" id="mobileDrawer" aria-label="Mobile Navigation">
+            <div class="drawer-header">
+                <div class="drawer-brand">
+                    <span class="drawer-logo">GRND</span>
+                    <span class="drawer-tag">OPTIONS</span>
+                </div>
+                <button type="button" class="drawer-close" id="closeMobileDrawer" aria-label="Close menu">&times;</button>
+            </div>
+
+            <div class="drawer-content">
+                <!-- Highlighted Login / Claim Coins Action -->
+                <button type="button" class="drawer-claim-btn" id="drawerClaimBtn">
+                    <span class="claim-icon">💰</span>
+                    <div class="claim-text">
+                        <strong>LOGIN TO CLAIM</strong>
+                        <span>1,000 Free Grand Coins</span>
+                    </div>
+                    <span class="claim-arrow">➔</span>
+                </button>
+
+                <!-- Navigation Options List -->
+                <nav class="drawer-nav">
+                    <button type="button" class="drawer-nav-item" id="drawerScreenshotsBtn">
+                        <span class="nav-icon">📸</span>
+                        <span class="nav-label">Screenshots</span>
+                        <span class="nav-badge">Features</span>
+                    </button>
+                    <a href="https://forum.rpgrand.com/" target="_blank" class="drawer-nav-item">
+                        <span class="nav-icon">💬</span>
+                        <span class="nav-label">Forum</span>
+                        <span class="nav-sub">Community</span>
+                    </a>
+                    <a href="https://rpgrand.com/en/shop" target="_blank" class="drawer-nav-item">
+                        <span class="nav-icon">🛒</span>
+                        <span class="nav-label">Shop</span>
+                        <span class="nav-badge discount">-30%</span>
+                    </a>
+                    <a href="https://rpgrand.com/en/download" target="_blank" class="drawer-nav-item highlight-download">
+                        <span class="nav-icon">📥</span>
+                        <span class="nav-label">Download .APK</span>
+                        <span class="nav-badge free">FREE</span>
+                    </a>
+                </nav>
+
+                <!-- All Languages Selector Section -->
+                <div class="drawer-section">
+                    <div class="drawer-section-title">
+                        <span>🌐</span> SELECT LANGUAGE
+                    </div>
+                    <div class="drawer-lang-grid" id="drawerLangGrid">
+                        <button type="button" class="drawer-lang-chip active" data-lang="en" data-name="English" data-emoji="🇺🇸">
+                            <span class="chip-flag">🇺🇸</span> EN
+                        </button>
+                        <button type="button" class="drawer-lang-chip" data-lang="de" data-name="Deutsch" data-emoji="🇩🇪">
+                            <span class="chip-flag">🇩🇪</span> DE
+                        </button>
+                        <button type="button" class="drawer-lang-chip" data-lang="es" data-name="Español" data-emoji="🇪🇸">
+                            <span class="chip-flag">🇪🇸</span> ES
+                        </button>
+                        <button type="button" class="drawer-lang-chip" data-lang="pt" data-name="Português" data-emoji="🇧🇷">
+                            <span class="chip-flag">🇧🇷</span> PT
+                        </button>
+                        <button type="button" class="drawer-lang-chip" data-lang="tr" data-name="Türkçe" data-emoji="🇹🇷">
+                            <span class="chip-flag">🇹🇷</span> TR
+                        </button>
+                        <button type="button" class="drawer-lang-chip" data-lang="id" data-name="Bahasa Indonesia" data-emoji="🇮🇩">
+                            <span class="chip-flag">🇮🇩</span> ID
+                        </button>
+                        <button type="button" class="drawer-lang-chip" data-lang="ms" data-name="Bahasa Melayu" data-emoji="🇲🇾">
+                            <span class="chip-flag">🇲🇾</span> MS
+                        </button>
+                        <button type="button" class="drawer-lang-chip" data-lang="th" data-name="Thai" data-emoji="🇹🇭">
+                            <span class="chip-flag">🇹🇭</span> TH
+                        </button>
+                        <button type="button" class="drawer-lang-chip" data-lang="ar" data-name="Arabic" data-emoji="🇸🇦">
+                            <span class="chip-flag">🇸🇦</span> AR
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Mobile Language Bottom Sheet -->
+        <div class="mobile-lang-sheet" id="mobileLangSheet" role="dialog" aria-modal="true" aria-label="Select Language">
+            <div class="sheet-header">
+                <h3>Select Language</h3>
+                <button type="button" class="close-sheet" id="closeLangSheet" aria-label="Close">&times;</button>
+            </div>
+            <div class="sheet-body">
+                <button type="button" class="lang-sheet-item active" data-lang="en" data-name="English" data-emoji="🇺🇸">
+                    <span class="sheet-flag">🇺🇸</span>
+                    <span class="sheet-name">English</span>
+                    <span class="sheet-check">✓</span>
+                </button>
+                <button type="button" class="lang-sheet-item" data-lang="de" data-name="Deutsch" data-emoji="🇩🇪">
+                    <span class="sheet-flag">🇩🇪</span>
+                    <span class="sheet-name">Deutsch</span>
+                </button>
+                <button type="button" class="lang-sheet-item" data-lang="es" data-name="Español" data-emoji="🇪🇸">
+                    <span class="sheet-flag">🇪🇸</span>
+                    <span class="sheet-name">Español</span>
+                </button>
+                <button type="button" class="lang-sheet-item" data-lang="pt" data-name="Português" data-emoji="🇧🇷">
+                    <span class="sheet-flag">🇧🇷</span>
+                    <span class="sheet-name">Português</span>
+                </button>
+                <button type="button" class="lang-sheet-item" data-lang="tr" data-name="Türkçe" data-emoji="🇹🇷">
+                    <span class="sheet-flag">🇹🇷</span>
+                    <span class="sheet-name">Türkçe</span>
+                </button>
+                <button type="button" class="lang-sheet-item" data-lang="id" data-name="Bahasa Indonesia" data-emoji="🇮🇩">
+                    <span class="sheet-flag">🇮🇩</span>
+                    <span class="sheet-name">Bahasa Indonesia</span>
+                </button>
+                <button type="button" class="lang-sheet-item" data-lang="ms" data-name="Bahasa Melayu" data-emoji="🇲🇾">
+                    <span class="sheet-flag">🇲🇾</span>
+                    <span class="sheet-name">Bahasa Melayu</span>
+                </button>
+                <button type="button" class="lang-sheet-item" data-lang="th" data-name="Thai" data-emoji="🇹🇭">
+                    <span class="sheet-flag">🇹🇭</span>
+                    <span class="sheet-name">ภาษาไทย (Thai)</span>
+                </button>
+                <button type="button" class="lang-sheet-item" data-lang="ar" data-name="Arabic" data-emoji="🇸🇦">
+                    <span class="sheet-flag">🇸🇦</span>
+                    <span class="sheet-name">العربية (Arabic)</span>
+                </button>
+            </div>
         </div>
     </div>
 

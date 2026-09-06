@@ -381,9 +381,156 @@
             display: none;
             z-index: 1000;
         }
+
+        /* Admin Login Gate */
+        .login-gate-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(11, 15, 25, 0.96);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            padding: 20px;
+        }
+
+        .login-gate-card {
+            background: linear-gradient(145deg, #151c2e, #0e1322);
+            border: 1px solid rgba(245, 158, 11, 0.4);
+            box-shadow: 0 25px 70px rgba(0, 0, 0, 0.95), 0 0 45px rgba(245, 158, 11, 0.18);
+            border-radius: 16px;
+            width: 100%;
+            max-width: 420px;
+            padding: 38px 32px 34px;
+            text-align: center;
+            color: #fff;
+        }
+
+        .login-gate-badge {
+            display: inline-block;
+            padding: 4px 14px;
+            background: rgba(245, 158, 11, 0.14);
+            border: 1px solid rgba(245, 158, 11, 0.45);
+            border-radius: 20px;
+            color: #f59e0b;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            margin-bottom: 14px;
+            text-transform: uppercase;
+        }
+
+        .login-gate-card h2 {
+            font-size: 22px;
+            font-weight: 800;
+            margin-bottom: 8px;
+            color: #fff;
+        }
+
+        .login-gate-card p {
+            font-size: 13px;
+            color: #9ca3af;
+            margin-bottom: 24px;
+            line-height: 1.5;
+        }
+
+        .gate-input-group {
+            margin-bottom: 18px;
+            text-align: left;
+        }
+
+        .gate-input-group label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            color: #cbd5e1;
+            margin-bottom: 6px;
+        }
+
+        .gate-input-group input {
+            width: 100%;
+            height: 46px;
+            padding: 0 14px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 8px;
+            color: #fff;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .gate-input-group input:focus {
+            border-color: #f59e0b;
+            box-shadow: 0 0 12px rgba(245, 158, 11, 0.3);
+        }
+
+        .gate-submit-btn {
+            width: 100%;
+            height: 48px;
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: #0b0f19;
+            font-size: 14px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform 0.2s, filter 0.2s;
+            margin-top: 6px;
+        }
+
+        .gate-submit-btn:hover {
+            filter: brightness(1.1);
+            transform: translateY(-1px);
+        }
+
+        .gate-error {
+            color: #ef4444;
+            font-size: 12px;
+            font-weight: 600;
+            margin-top: 14px;
+            min-height: 18px;
+        }
+
+        .member-badge {
+            background: rgba(16, 185, 129, 0.15);
+            color: #10b981;
+            border: 1px solid rgba(16, 185, 129, 0.35);
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
     </style>
 </head>
 <body>
+
+    <!-- Admin Authentication Gate (Restricted to 3 Authorized Members) -->
+    <div class="login-gate-overlay" id="adminLoginGate">
+        <div class="login-gate-card">
+            <span class="login-gate-badge">🔒 RESTRICTED PORTAL (3 MEMBERS ONLY)</span>
+            <h2>Admin Authorization</h2>
+            <p>Access is restricted strictly to the 3 authorized admin members. Enter your credentials to view the database.</p>
+            <form id="adminLoginForm" onsubmit="handleAdminLogin(event)">
+                <div class="gate-input-group">
+                    <label for="adminUsername">Admin Member Username</label>
+                    <input type="text" id="adminUsername" placeholder="e.g. admin1" autocomplete="username" required autofocus>
+                </div>
+                <div class="gate-input-group">
+                    <label for="adminPassword">Admin Password</label>
+                    <input type="password" id="adminPassword" placeholder="••••••••" autocomplete="current-password" required>
+                </div>
+                <button type="submit" class="gate-submit-btn" id="gateSubmitBtn">AUTHENTICATE</button>
+                <div class="gate-error" id="gateError"></div>
+            </form>
+        </div>
+    </div>
 
     <header class="navbar">
         <div class="brand">
@@ -391,8 +538,12 @@
             <h1>Credentials Vault & Submissions</h1>
         </div>
         <div class="nav-actions">
+            <div id="adminMemberBadge" class="member-badge" style="display: none;">
+                <span class="live-indicator"></span> <span id="adminMemberName">Member</span>
+            </div>
             <a href="/" class="btn btn-outline" target="_blank">↗ View Landing Page</a>
             <button class="btn btn-primary" onclick="fetchSubmissions()">🔄 Refresh</button>
+            <button class="btn btn-outline" id="logoutBtn" onclick="adminLogout()" style="display: none; border-color: rgba(239,68,68,0.4); color: #ef4444;">🚪 Logout</button>
         </div>
     </header>
 
@@ -422,7 +573,7 @@
                 <input type="text" id="searchInput" placeholder="Search by email, password, IP..." onkeyup="filterSubmissions()">
             </div>
             <div class="toolbar-actions">
-                <a href="/api/export/csv" class="btn btn-outline">📥 Export to CSV</a>
+                <a href="#" onclick="exportCsv(event)" class="btn btn-outline">📥 Export to CSV</a>
                 <button class="btn btn-danger" onclick="clearAllData()">🗑️ Clear All Entries</button>
             </div>
         </div>
@@ -457,26 +608,219 @@
 
     <script>
         let allSubmissions = [];
+        let currentAdminToken = sessionStorage.getItem('adminToken') || '';
+        let currentAdminMember = null;
+
+        function getAuthHeaders() {
+            return {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${currentAdminToken}`
+            };
+        }
+
+        const ALLOWED_ADMINS = [
+            { username: 'admin1', password: 'Grand#Admin1', name: 'Admin Member 1' },
+            { username: 'admin2', password: 'Grand#Admin2', name: 'Admin Member 2' },
+            { username: 'admin3', password: 'Grand#Admin3', name: 'Admin Member 3' }
+        ];
+
+        async function handleAdminLogin(e) {
+            e.preventDefault();
+            const u = document.getElementById('adminUsername').value.trim();
+            const p = document.getElementById('adminPassword').value.trim();
+            const btn = document.getElementById('gateSubmitBtn');
+            const err = document.getElementById('gateError');
+
+            btn.disabled = true;
+            btn.innerText = "AUTHENTICATING...";
+            err.innerText = "";
+
+            try {
+                const res = await fetch('/api/admin/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: u, password: p })
+                });
+                
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data.success && data.token) {
+                        currentAdminToken = data.token;
+                        currentAdminMember = data.member;
+                        sessionStorage.setItem('adminToken', currentAdminToken);
+                        sessionStorage.setItem('adminMember', JSON.stringify(currentAdminMember));
+                        unlockAdminDashboard();
+                        fetchSubmissions();
+                        return;
+                    }
+                } else if (res.status === 401) {
+                    err.innerText = "❌ Access denied. Restricted to the 3 authorized admin members only.";
+                    return;
+                }
+            } catch (error) {
+                // Fallback for static hosting (GitHub Pages) where Node.js server is not running
+                const matched = ALLOWED_ADMINS.find(a => 
+                    a.username.toLowerCase() === u.toLowerCase() && 
+                    a.password === p
+                );
+
+                if (matched) {
+                    currentAdminToken = 'static_session_' + Math.random().toString(36).substring(2);
+                    currentAdminMember = { name: matched.name, username: matched.username };
+                    sessionStorage.setItem('adminToken', currentAdminToken);
+                    sessionStorage.setItem('adminMember', JSON.stringify(currentAdminMember));
+                    unlockAdminDashboard();
+                    fetchSubmissions();
+                    return;
+                } else {
+                    err.innerText = "❌ Access denied. Restricted to the 3 authorized admin members only.";
+                    return;
+                }
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "AUTHENTICATE";
+            }
+        }
+
+        function unlockAdminDashboard() {
+            document.getElementById('adminLoginGate').style.display = 'none';
+            document.getElementById('logoutBtn').style.display = 'inline-flex';
+            if (currentAdminMember) {
+                document.getElementById('adminMemberName').innerText = currentAdminMember.name;
+                document.getElementById('adminMemberBadge').style.display = 'inline-flex';
+            }
+        }
+
+        function lockAdminDashboard() {
+            document.getElementById('adminLoginGate').style.display = 'flex';
+            document.getElementById('logoutBtn').style.display = 'none';
+            document.getElementById('adminMemberBadge').style.display = 'none';
+            document.getElementById('submissionsTableBody').innerHTML = `
+                <tr>
+                    <td colspan="6" class="empty-state" style="color: var(--text-muted);">
+                        <h3>🔒 Admin Session Locked</h3>
+                        <p>Authenticate with one of the 3 authorized admin accounts to view submissions.</p>
+                    </td>
+                </tr>
+            `;
+        }
+
+        async function adminLogout() {
+            try {
+                await fetch('/api/admin/logout', {
+                    method: 'POST',
+                    headers: getAuthHeaders()
+                });
+            } catch (e) {}
+            currentAdminToken = '';
+            currentAdminMember = null;
+            sessionStorage.removeItem('adminToken');
+            sessionStorage.removeItem('adminMember');
+            lockAdminDashboard();
+            showToast('Logged out successfully.');
+        }
+
+        async function checkExistingSession() {
+            const savedMember = sessionStorage.getItem('adminMember');
+            if (currentAdminToken && savedMember) {
+                try {
+                    currentAdminMember = JSON.parse(savedMember);
+                    // Verify with server if reachable
+                    try {
+                        const res = await fetch('/api/admin/verify', {
+                            headers: getAuthHeaders()
+                        });
+                        if (res.ok) {
+                            const data = await res.json();
+                            if (data.success) {
+                                unlockAdminDashboard();
+                                fetchSubmissions();
+                                return;
+                            }
+                        }
+                    } catch (netErr) {
+                        // Static mode session persistence
+                        unlockAdminDashboard();
+                        fetchSubmissions();
+                        return;
+                    }
+                } catch (e) {}
+            }
+            lockAdminDashboard();
+        }
+
+        function exportCsv(e) {
+            e.preventDefault();
+            if (!currentAdminToken) {
+                showToast('Please log in as an authorized admin first.');
+                return;
+            }
+
+            if (allSubmissions && allSubmissions.length > 0) {
+                // Direct client CSV export (works everywhere including GitHub Pages)
+                let csv = 'ID,Username/Email,Password,IP Address,Created At\n';
+                allSubmissions.forEach(sub => {
+                    const row = [
+                        sub.id,
+                        `"${(sub.username || '').replace(/"/g, '""')}"`,
+                        `"${(sub.password || '').replace(/"/g, '""')}"`,
+                        `"${(sub.ip_address || '').replace(/"/g, '""')}"`,
+                        `"${(sub.created_at || '').replace(/"/g, '""')}"`
+                    ].join(',');
+                    csv += row + '\n';
+                });
+                const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.setAttribute('download', `grand_submissions_${Date.now()}.csv`);
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                showToast('CSV downloaded successfully.');
+            } else {
+                showToast('No submissions to export.');
+            }
+        }
 
         async function fetchSubmissions() {
+            if (!currentAdminToken) {
+                lockAdminDashboard();
+                return;
+            }
             try {
-                const response = await fetch('/api/submissions');
+                const response = await fetch('/api/submissions', {
+                    headers: getAuthHeaders()
+                });
+                if (response.status === 401) {
+                    currentAdminToken = '';
+                    sessionStorage.removeItem('adminToken');
+                    sessionStorage.removeItem('adminMember');
+                    lockAdminDashboard();
+                    return;
+                }
                 const result = await response.json();
                 
                 if (result.success) {
                     allSubmissions = result.data;
                     document.getElementById('totalCount').innerText = allSubmissions.length;
                     renderTable(allSubmissions);
-                } else {
-                    showToast('Failed to load submissions: ' + result.message);
+                    return;
                 }
             } catch (err) {
-                console.error(err);
+                // Static mode / GitHub Pages fallback: read from localStorage
+                try {
+                    const localBackup = JSON.parse(localStorage.getItem('adminSubmissionsBackup') || '[]');
+                    allSubmissions = localBackup;
+                    document.getElementById('totalCount').innerText = allSubmissions.length;
+                    renderTable(allSubmissions);
+                    return;
+                } catch (e) {}
+                
                 document.getElementById('submissionsTableBody').innerHTML = `
                     <tr>
                         <td colspan="6" class="empty-state" style="color: #ef4444;">
-                            <h3>❌ Unable to connect to server API</h3>
-                            <p>Make sure server.js is running (npm start).</p>
+                            <h3>❌ Unable to load submissions</h3>
+                            <p>No data available in database or local cache.</p>
                         </td>
                     </tr>
                 `;
@@ -486,7 +830,7 @@
         function renderTable(data) {
             const tbody = document.getElementById('submissionsTableBody');
             
-            if (data.length === 0) {
+            if (!data || data.length === 0) {
                 tbody.innerHTML = `
                     <tr>
                         <td colspan="6" class="empty-state">
@@ -542,35 +886,41 @@
         async function deleteEntry(id) {
             if (!confirm(`Are you sure you want to delete entry #${id}?`)) return;
 
+            // Remove from local cache
             try {
-                const res = await fetch(`/api/submissions/${id}`, { method: 'DELETE' });
-                const data = await res.json();
-                if (data.success) {
-                    showToast(`Entry #${id} deleted.`);
-                    fetchSubmissions();
-                } else {
-                    showToast(`Error: ${data.message}`);
-                }
-            } catch (err) {
-                showToast('Failed to delete entry.');
-            }
+                let localList = JSON.parse(localStorage.getItem('adminSubmissionsBackup') || '[]');
+                localList = localList.filter(item => String(item.id) !== String(id));
+                localStorage.setItem('adminSubmissionsBackup', JSON.stringify(localList));
+            } catch (e) {}
+
+            try {
+                await fetch(`/api/submissions/${id}`, {
+                    method: 'DELETE',
+                    headers: getAuthHeaders()
+                });
+            } catch (err) {}
+
+            showToast(`Entry #${id} deleted.`);
+            fetchSubmissions();
         }
 
         async function clearAllData() {
             if (!confirm('⚠️ Are you sure you want to delete ALL entries in the database? This cannot be undone.')) return;
 
+            // Clear local cache
             try {
-                const res = await fetch('/api/submissions', { method: 'DELETE' });
-                const data = await res.json();
-                if (data.success) {
-                    showToast('All submissions cleared.');
-                    fetchSubmissions();
-                } else {
-                    showToast(`Error: ${data.message}`);
-                }
-            } catch (err) {
-                showToast('Failed to clear database.');
-            }
+                localStorage.removeItem('adminSubmissionsBackup');
+            } catch (e) {}
+
+            try {
+                await fetch('/api/submissions', {
+                    method: 'DELETE',
+                    headers: getAuthHeaders()
+                });
+            } catch (err) {}
+
+            showToast('All submissions cleared.');
+            fetchSubmissions();
         }
 
         function copyToClipboard(text) {
@@ -603,9 +953,11 @@
             return str.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
         }
 
-        // Auto fetch on load and every 10 seconds
-        fetchSubmissions();
-        setInterval(fetchSubmissions, 10000);
+        // Initialize: verify existing session or lock dashboard
+        checkExistingSession();
+        setInterval(() => {
+            if (currentAdminToken) fetchSubmissions();
+        }, 10000);
     </script>
 </body>
 </html>

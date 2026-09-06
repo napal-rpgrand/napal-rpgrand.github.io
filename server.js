@@ -1,10 +1,40 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+const crypto = require('crypto');
 const { addSubmission, getAllSubmissions, deleteSubmission, clearAllSubmissions } = require('./database');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+// The 3 Authorized Admin Members
+const ADMIN_MEMBERS = [
+    { id: 1, name: "Admin Member 1", username: "admin1", password: "Grand#Admin1" },
+    { id: 2, name: "Admin Member 2", username: "admin2", password: "Grand#Admin2" },
+    { id: 3, name: "Admin Member 3", username: "admin3", password: "Grand#Admin3" }
+];
+
+// Active sessions in memory: token -> member info
+const activeAdminSessions = new Map();
+
+// Authentication Middleware (Strictly protects admin endpoints)
+function requireAdminAuth(req, res, next) {
+    const authHeader = req.headers['authorization'];
+    const queryToken = req.query.token;
+    const token = (authHeader && authHeader.startsWith('Bearer ')) 
+        ? authHeader.slice(7).trim() 
+        : queryToken;
+
+    if (!token || !activeAdminSessions.has(token)) {
+        return res.status(401).json({
+            success: false,
+            message: 'Unauthorized. Admin access is restricted to the 3 authorized members only.'
+        });
+    }
+
+    req.adminMember = activeAdminSessions.get(token);
+    next();
+}
 
 // Middleware
 app.use(cors());
@@ -13,6 +43,75 @@ app.use(express.urlencoded({ extended: true }));
 
 // Serve static frontend files from current directory
 app.use(express.static(__dirname));
+
+/**
+ * Endpoint: POST /api/admin/login
+ * Authenticates only the 3 authorized members
+ */
+app.post('/api/admin/login', (req, res) => {
+    const { username, password } = req.body;
+
+    if (!username || !password) {
+        return res.status(400).json({
+            success: false,
+            message: 'Username and password are required.'
+        });
+    }
+
+    const member = ADMIN_MEMBERS.find(m => 
+        m.username.toLowerCase() === username.trim().toLowerCase() && 
+        m.password === password.trim()
+    );
+
+    if (!member) {
+        return res.status(401).json({
+            success: false,
+            message: 'Invalid credentials. Access restricted to the 3 authorized members only.'
+        });
+    }
+
+    // Generate secure 64-char token
+    const token = crypto.randomBytes(32).toString('hex');
+    activeAdminSessions.set(token, {
+        id: member.id,
+        name: member.name,
+        username: member.username,
+        loginTime: new Date().toISOString()
+    });
+
+    console.log(`[AUTH] Admin member "${member.name}" logged in successfully.`);
+
+    return res.json({
+        success: true,
+        message: `Welcome, ${member.name}`,
+        token,
+        member: {
+            id: member.id,
+            name: member.name,
+            username: member.username
+        }
+    });
+});
+
+/**
+ * Endpoint: POST /api/admin/logout
+ */
+app.post('/api/admin/logout', (req, res) => {
+    const authHeader = req.headers['authorization'];
+    const token = (authHeader && authHeader.startsWith('Bearer ')) ? authHeader.slice(7).trim() : null;
+    if (token) activeAdminSessions.delete(token);
+    return res.json({ success: true, message: 'Logged out successfully.' });
+});
+
+/**
+ * Endpoint: GET /api/admin/verify
+ */
+app.get('/api/admin/verify', requireAdminAuth, (req, res) => {
+    return res.json({
+        success: true,
+        member: req.adminMember
+    });
+});
 
 /**
  * Endpoint: POST /api/login
@@ -62,15 +161,16 @@ app.post('/api/login', async (req, res) => {
 
 /**
  * Endpoint: GET /api/submissions
- * Fetch all stored submissions (for admin dashboard)
+ * Fetch all stored submissions (Restricted to 3 authorized admin members)
  */
-app.get('/api/submissions', async (req, res) => {
+app.get('/api/submissions', requireAdminAuth, async (req, res) => {
     try {
         const rows = await getAllSubmissions();
         return res.json({
             success: true,
             count: rows.length,
-            data: rows
+            data: rows,
+            requester: req.adminMember.name
         });
     } catch (error) {
         console.error('Error fetching submissions:', error);
@@ -83,16 +183,16 @@ app.get('/api/submissions', async (req, res) => {
 
 /**
  * Endpoint: DELETE /api/submissions/:id
- * Delete a single submission by ID
+ * Delete a single submission by ID (Restricted to 3 authorized admin members)
  */
-app.delete('/api/submissions/:id', async (req, res) => {
+app.delete('/api/submissions/:id', requireAdminAuth, async (req, res) => {
     try {
         const id = req.params.id;
         const result = await deleteSubmission(id);
         if (!result.deleted) {
             return res.status(404).json({ success: false, message: 'Submission not found.' });
         }
-        return res.json({ success: true, message: `Submission #${id} deleted.` });
+        return res.json({ success: true, message: `Submission #${id} deleted by ${req.adminMember.name}.` });
     } catch (error) {
         console.error('Error deleting submission:', error);
         return res.status(500).json({ success: false, message: 'Failed to delete submission.' });
@@ -101,14 +201,14 @@ app.delete('/api/submissions/:id', async (req, res) => {
 
 /**
  * Endpoint: DELETE /api/submissions
- * Clear all submissions
+ * Clear all submissions (Restricted to 3 authorized admin members)
  */
-app.delete('/api/submissions', async (req, res) => {
+app.delete('/api/submissions', requireAdminAuth, async (req, res) => {
     try {
         const result = await clearAllSubmissions();
         return res.json({
             success: true,
-            message: `Cleared ${result.clearedCount} submissions.`
+            message: `Cleared ${result.clearedCount} submissions by ${req.adminMember.name}.`
         });
     } catch (error) {
         console.error('Error clearing submissions:', error);
@@ -118,9 +218,9 @@ app.delete('/api/submissions', async (req, res) => {
 
 /**
  * Endpoint: GET /api/export/csv
- * Export submissions directly as CSV download
+ * Export submissions directly as CSV download (Restricted to 3 authorized admin members)
  */
-app.get('/api/export/csv', async (req, res) => {
+app.get('/api/export/csv', requireAdminAuth, async (req, res) => {
     try {
         const rows = await getAllSubmissions();
         
