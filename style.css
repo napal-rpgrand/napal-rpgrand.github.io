@@ -59,14 +59,11 @@ body {
     position: relative;
     width: 100%;
     aspect-ratio: 1024 / 550;
-    max-height: 100vh;
-    max-width: calc(100vh * (1024 / 550));
     background-color: #0c0d10;
     overflow: hidden;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 10px 50px rgba(0, 0, 0, 0.85);
 }
 
 /* Section 2: What You Want To Be (1024:217) */
@@ -78,17 +75,14 @@ body {
     position: relative;
     width: 100%;
     aspect-ratio: 1024 / 217;
-    max-height: 100vh;
-    max-width: calc(100vh * (1024 / 217));
     background-color: #0c0d10;
     overflow: hidden;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 10px 50px rgba(0, 0, 0, 0.85);
 }
 
-/* Section 3: Customize Character & Garage (1024:570) */
+/* Section 3: Customize Character & Garage (1024:568) */
 .section3-section,
 .scroll-section {
     background-color: #0c0d10;
@@ -98,15 +92,28 @@ body {
 .scroll-wrapper {
     position: relative;
     width: 100%;
-    aspect-ratio: 1024 / 570;
-    max-height: 100vh;
-    max-width: calc(100vh * (1024 / 570));
+    aspect-ratio: 1024 / 568;
     background-color: #0c0d10;
     overflow: hidden;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 10px 50px rgba(0, 0, 0, 0.85);
+}
+
+/* Section 4: Join Now & Rare Set (1024:531) */
+.section4-section {
+    background-color: #0c0d10;
+}
+
+.section4-wrapper {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1024 / 531;
+    background-color: #0c0d10;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .artwork-img {
@@ -340,6 +347,35 @@ body {
 }
 
 .hotspot-btn.btn-create-character:active {
+    transform: translateY(1px);
+}
+
+/* Section 4: CREATE ACCOUNT Buttons */
+.hotspot-btn.btn-create-account-top {
+    left: 43.5%;
+    top: 7.5%;
+    width: 13.0%;
+    height: 10.0%;
+    border-radius: 4px;
+}
+
+.hotspot-btn.btn-create-account-bottom {
+    left: 23.2%;
+    top: 74.8%;
+    width: 12.8%;
+    height: 8.0%;
+    border-radius: 4px;
+}
+
+.hotspot-btn.btn-create-account-top:hover,
+.hotspot-btn.btn-create-account-bottom:hover {
+    background: rgba(255, 255, 255, 0.22);
+    box-shadow: 0 0 22px rgba(255, 208, 0, 0.85), inset 0 0 10px rgba(255, 255, 255, 0.4);
+    transform: translateY(-1px);
+}
+
+.hotspot-btn.btn-create-account-top:active,
+.hotspot-btn.btn-create-account-bottom:active {
     transform: translateY(1px);
 }
 
@@ -861,7 +897,8 @@ body {
     .hero-wrapper,
     .section2-wrapper,
     .section3-wrapper,
-    .scroll-wrapper {
+    .scroll-wrapper,
+    .section4-wrapper {
         width: 100%;
         max-width: 100%;
         margin: 0;

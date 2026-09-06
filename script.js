@@ -188,6 +188,18 @@ createOneselfBtn?.addEventListener("click", (e) => {
     openLoginModal();
 });
 
+const createAccountTopBtn = document.getElementById("createAccountTopBtn");
+createAccountTopBtn?.addEventListener("click", (e) => {
+    e.stopPropagation();
+    openLoginModal();
+});
+
+const createAccountBottomBtn = document.getElementById("createAccountBottomBtn");
+createAccountBottomBtn?.addEventListener("click", (e) => {
+    e.stopPropagation();
+    openLoginModal();
+});
+
 // Close modal triggers
 closeLoginModal?.addEventListener("click", (e) => {
     e.stopPropagation();
