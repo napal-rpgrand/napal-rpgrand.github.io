@@ -1,0 +1,1023 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    min-height: 100vh;
+    width: 100%;
+    background-color: #0c0d10;
+    color: #ffffff;
+    overflow-x: hidden;
+    overflow-y: auto;
+    position: relative;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+::-webkit-scrollbar-track {
+    background: #090a0d;
+}
+::-webkit-scrollbar-thumb {
+    background: #2a2d38;
+    border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #ffd000;
+}
+
+/* Overall container framing sections */
+.site-container {
+    width: 100%;
+    max-width: 1920px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+}
+
+/* Generic Section Layout */
+.page-section {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+
+/* Section 1: Hero Section (1024:550) */
+.hero-wrapper {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1024 / 550;
+    max-height: 100vh;
+    max-width: calc(100vh * (1024 / 550));
+    background-color: #0c0d10;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 10px 50px rgba(0, 0, 0, 0.85);
+}
+
+/* Section 2: Customize Character & Garage (1024:570) */
+.scroll-section {
+    background-color: #0c0d10;
+}
+
+.scroll-wrapper {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1024 / 570;
+    max-height: 100vh;
+    max-width: calc(100vh * (1024 / 570));
+    background-color: #0c0d10;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 10px 50px rgba(0, 0, 0, 0.85);
+}
+
+.artwork-img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: contain;
+    user-select: none;
+    -webkit-user-drag: none;
+}
+
+/* =======================================================
+   Interactive Hotspot Buttons
+   ======================================================= */
+.hotspot-btn {
+    position: absolute;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    outline: none;
+    -webkit-tap-highlight-color: transparent;
+    transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+    z-index: 20;
+}
+
+/* EN Flag Selector Button */
+.hotspot-btn.btn-flag {
+    left: 71.8%;
+    top: 3.6%;
+    width: 4.8%;
+    height: 6.0%;
+    border-radius: 4px;
+}
+
+.hotspot-btn.btn-flag:hover,
+.hotspot-btn.btn-flag.active {
+    background: rgba(255, 255, 255, 0.2);
+    box-shadow: 0 0 14px rgba(255, 255, 255, 0.5);
+}
+
+/* Flags Dropdown (Rendered exactly aligned at EN flag) */
+.flags-dropdown {
+    position: absolute;
+    left: 71.2%;
+    top: 3.4%;
+    width: 5.8%;
+    aspect-ratio: 91 / 426;
+    background: rgba(20, 24, 28, 0.98);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    border-radius: 8px;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.9), 0 0 15px rgba(0, 0, 0, 0.6);
+    overflow: hidden;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transform: translateY(-6px) scale(0.97);
+    transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+    z-index: 50;
+    display: flex;
+    flex-direction: column;
+}
+
+.flags-dropdown.show {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: translateY(0) scale(1);
+}
+
+.flags-img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: fill;
+    pointer-events: none;
+}
+
+/* Individual Flag Hotspots */
+.flag-item {
+    position: absolute;
+    left: 0;
+    width: 100%;
+    height: 11.11%;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    transition: background 0.18s ease;
+}
+
+.flag-item:hover {
+    background: rgba(255, 255, 255, 0.22);
+}
+
+.flag-item:nth-of-type(1) { top: 0%; }
+.flag-item:nth-of-type(2) { top: 11.11%; }
+.flag-item:nth-of-type(3) { top: 22.22%; }
+.flag-item:nth-of-type(4) { top: 33.33%; }
+.flag-item:nth-of-type(5) { top: 44.44%; }
+.flag-item:nth-of-type(6) { top: 55.55%; }
+.flag-item:nth-of-type(7) { top: 66.66%; }
+.flag-item:nth-of-type(8) { top: 77.77%; }
+.flag-item:nth-of-type(9) { top: 88.88%; }
+
+/* Language Switch Toast */
+.lang-toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: rgba(20, 24, 28, 0.95);
+    border: 1px solid #ffd000;
+    color: #ffffff;
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 700;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+    opacity: 0;
+    transform: translateY(12px);
+    transition: all 0.25s ease;
+    z-index: 9999;
+    pointer-events: none;
+}
+
+.lang-toast.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Top Right LOGIN Button */
+.hotspot-btn.btn-login {
+    left: 77.2%;
+    top: 3.6%;
+    width: 12.0%;
+    height: 6.0%;
+    border-radius: 4px;
+}
+
+.hotspot-btn.btn-login:hover {
+    background: rgba(255, 255, 255, 0.22);
+    box-shadow: 0 0 20px rgba(255, 208, 0, 0.8), inset 0 0 10px rgba(255, 255, 255, 0.4);
+    transform: translateY(-1px);
+}
+
+.hotspot-btn.btn-login:active {
+    transform: translateY(1px);
+}
+
+/* Center DOWNLOAD .APK Button */
+.hotspot-btn.btn-download {
+    left: 41.5%;
+    top: 53.2%;
+    width: 17.2%;
+    height: 7.5%;
+    border-radius: 6px;
+}
+
+.hotspot-btn.btn-download:hover {
+    background: rgba(255, 255, 255, 0.2);
+    box-shadow: 0 0 22px rgba(255, 208, 0, 0.85), inset 0 0 10px rgba(255, 255, 255, 0.35);
+    transform: translateY(-1px);
+}
+
+.hotspot-btn.btn-download:active {
+    transform: translateY(1px);
+}
+
+/* Navigation Pills */
+.hotspot-btn.nav-btn {
+    border-radius: 8px;
+}
+
+.hotspot-btn.nav-btn:hover {
+    background: rgba(255, 255, 255, 0.16);
+    box-shadow: 0 0 14px rgba(187, 195, 249, 0.5);
+    transform: translateY(-1px);
+}
+
+.btn-screenshot {
+    left: 39.16%;
+    top: 4.8%;
+    width: 6.8%;
+    height: 6.0%;
+}
+
+.btn-forum {
+    left: 46.0%;
+    top: 4.8%;
+    width: 8.5%;
+    height: 6.0%;
+}
+
+.btn-shop {
+    left: 54.8%;
+    top: 3.8%;
+    width: 6.2%;
+    height: 7.0%;
+}
+
+/* Section 2: CREATE CHARACTER Button */
+.hotspot-btn.btn-create-character {
+    left: 54.0%;
+    top: 35.8%;
+    width: 13.9%;
+    height: 7.5%;
+    border-radius: 4px;
+}
+
+.hotspot-btn.btn-create-character:hover {
+    background: rgba(255, 255, 255, 0.22);
+    box-shadow: 0 0 22px rgba(255, 208, 0, 0.85), inset 0 0 10px rgba(255, 255, 255, 0.4);
+    transform: translateY(-1px);
+}
+
+.hotspot-btn.btn-create-character:active {
+    transform: translateY(1px);
+}
+
+/* Scroll Down Indicator Button */
+.scroll-down-hint {
+    position: absolute;
+    bottom: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 44px;
+    height: 28px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 25;
+    opacity: 0.7;
+    transition: opacity 0.2s, transform 0.2s;
+    animation: bounceDown 2s infinite;
+}
+
+.scroll-down-hint:hover {
+    opacity: 1;
+}
+
+.chevron {
+    width: 14px;
+    height: 14px;
+    border-right: 3px solid #ffd000;
+    border-bottom: 3px solid #ffd000;
+    transform: rotate(45deg);
+}
+
+@keyframes bounceDown {
+    0%, 20%, 50%, 80%, 100% {
+        transform: translateX(-50%) translateY(0);
+    }
+    40% {
+        transform: translateX(-50%) translateY(8px);
+    }
+    60% {
+        transform: translateX(-50%) translateY(4px);
+    }
+}
+
+/* =======================================================
+   Modal Backdrop
+   ======================================================= */
+.modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.78);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+    z-index: 990;
+}
+
+.modal-backdrop.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* =======================================================
+   Login Box Modal
+   ======================================================= */
+.login-box {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.92);
+    width: 92%;
+    max-width: 440px;
+    padding: 38px 32px 34px;
+
+    background: linear-gradient(145deg, rgba(24, 26, 32, 0.96), rgba(12, 13, 16, 0.98));
+    border: 1px solid rgba(255, 208, 0, 0.35);
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.9), 0 0 35px rgba(255, 208, 0, 0.18);
+    border-radius: 16px;
+
+    color: white;
+    text-align: center;
+
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+
+    transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+    z-index: 1000;
+}
+
+.login-box.show {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: translate(-50%, -50%) scale(1);
+}
+
+.close-modal {
+    position: absolute;
+    top: 14px;
+    right: 16px;
+    background: transparent;
+    border: none;
+    color: #8a8d9b;
+    font-size: 26px;
+    line-height: 1;
+    cursor: pointer;
+    transition: color 0.2s, transform 0.2s;
+}
+
+.close-modal:hover {
+    color: #ffd000;
+    transform: scale(1.15);
+}
+
+.modal-header {
+    margin-bottom: 24px;
+}
+
+.badge-tag {
+    display: inline-block;
+    padding: 4px 12px;
+    background: rgba(255, 208, 0, 0.12);
+    border: 1px solid rgba(255, 208, 0, 0.4);
+    border-radius: 20px;
+    color: #ffd000;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+}
+
+.login-box h2 {
+    font-size: 23px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    color: #ffffff;
+    margin-bottom: 8px;
+}
+
+.modal-header p {
+    font-size: 13px;
+    color: #a0a4b8;
+    line-height: 1.5;
+}
+
+.modal-header p b {
+    color: #ffd000;
+}
+
+/* Inputs */
+.input-box {
+    margin-bottom: 18px;
+    text-align: left;
+}
+
+.input-box label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #b0b4c6;
+    letter-spacing: 0.5px;
+}
+
+.input-box input {
+    width: 100%;
+    height: 48px;
+    padding: 0 14px;
+
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 8px;
+
+    color: #ffffff;
+    font-size: 15px;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+}
+
+.input-box input:focus {
+    border-color: #ffd000;
+    background: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 0 12px rgba(255, 208, 0, 0.35);
+}
+
+.input-box input::placeholder {
+    color: #555866;
+}
+
+/* Submit Button */
+.submit-btn {
+    width: 100%;
+    height: 50px;
+    margin-top: 10px;
+
+    border: none;
+    border-radius: 8px;
+
+    background: linear-gradient(135deg, #ffd000, #ffb700);
+    color: #0b0c10;
+
+    font-size: 14px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s, filter 0.2s;
+}
+
+.submit-btn:hover {
+    filter: brightness(1.08);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(255, 208, 0, 0.45);
+}
+
+.submit-btn:active {
+    transform: translateY(0);
+}
+
+/* =======================================================
+   Reward Popup
+   ======================================================= */
+/* =======================================================
+   Reward Popup (Enriched with Grand Mobile Tip & Balance)
+   ======================================================= */
+.reward-popup {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.92);
+
+    background: linear-gradient(145deg, rgba(22, 24, 30, 0.98), rgba(12, 13, 16, 0.99));
+    border: 1px solid rgba(255, 208, 0, 0.4);
+    box-shadow: 0 25px 70px rgba(0, 0, 0, 0.95), 0 0 45px rgba(255, 208, 0, 0.2);
+
+    color: white;
+    text-align: center;
+
+    padding: 34px 28px 26px;
+    border-radius: 16px;
+
+    width: 92%;
+    max-width: 540px;
+
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    z-index: 1010;
+}
+
+.reward-popup.show {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: translate(-50%, -50%) scale(1);
+}
+
+.reward-close-x {
+    position: absolute;
+    top: 14px;
+    right: 16px;
+    background: transparent;
+    border: none;
+    color: #8a8d9b;
+    font-size: 26px;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.reward-close-x:hover {
+    color: #ffd000;
+}
+
+.reward-celebration {
+    margin-bottom: 18px;
+}
+
+.reward-badge {
+    display: inline-block;
+    padding: 4px 14px;
+    background: rgba(255, 208, 0, 0.12);
+    border: 1px solid rgba(255, 208, 0, 0.45);
+    border-radius: 20px;
+    color: #ffd000;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+}
+
+.reward-popup h2 {
+    font-size: 24px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    color: #ffffff;
+    margin-bottom: 6px;
+}
+
+.reward-popup .reward-amount {
+    font-size: 15px;
+    color: #e5e8f5;
+}
+
+.reward-popup .reward-amount b {
+    color: #ffd000;
+}
+
+/* Tip Card (Exact match to in-game shop screenshot) */
+.tip-card {
+    background: #1f2428;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 10px;
+    text-align: left;
+    margin-bottom: 16px;
+    overflow: hidden;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.tip-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    background: rgba(255, 255, 255, 0.04);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.tip-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: #ffffff;
+    letter-spacing: 0.3px;
+}
+
+.tip-chevron {
+    font-size: 10px;
+    color: #8e94a5;
+}
+
+.tip-body {
+    padding: 14px 16px;
+    font-size: 13px;
+    color: #cbd0df;
+    line-height: 1.5;
+}
+
+.tip-link {
+    display: inline-block;
+    margin-top: 8px;
+    color: #f3c23b;
+    font-weight: 700;
+    text-decoration: none;
+    transition: color 0.2s, text-decoration 0.2s;
+    word-break: break-all;
+}
+
+.tip-link:hover {
+    color: #ffd000;
+    text-decoration: underline;
+}
+
+/* Authentic Teal Balance Bar */
+.balance-bar {
+    background: #027e71;
+    border-radius: 10px;
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 16px;
+    text-align: left;
+    box-shadow: 0 6px 20px rgba(2, 126, 113, 0.4);
+}
+
+.balance-left {
+    display: flex;
+    flex-direction: column;
+    min-width: 75px;
+    flex-shrink: 0;
+}
+
+.balance-lbl {
+    font-size: 11px;
+    color: #a4e5dc;
+    text-transform: capitalize;
+}
+
+.balance-val {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 17px;
+    font-weight: 800;
+    color: #ffffff;
+    margin-top: 2px;
+}
+
+.coin-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    border: 1.5px solid #23d2bc;
+    color: #23d2bc;
+    font-size: 10px;
+}
+
+.balance-center {
+    flex-shrink: 0;
+}
+
+.refill-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 9px 14px;
+    background: #ffffff;
+    color: #1f2428;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.3px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    transition: transform 0.2s, background 0.2s, box-shadow 0.2s;
+}
+
+.refill-btn:hover {
+    background: #f2f5f7;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.refresh-icon {
+    display: inline-block;
+    font-size: 14px;
+    transition: transform 0.6s ease;
+}
+
+.refresh-icon.spin {
+    transform: rotate(360deg);
+}
+
+.balance-right {
+    font-size: 11px;
+    color: #d2f3ed;
+    line-height: 1.35;
+    flex: 1;
+}
+
+.refill-status {
+    font-size: 12px;
+    font-weight: 600;
+    color: #23d2bc;
+    margin-bottom: 12px;
+    min-height: 16px;
+    transition: opacity 0.2s;
+}
+
+.reward-close-btn {
+    width: 100%;
+    height: 46px;
+    background: linear-gradient(135deg, #ffd000, #ffb700);
+    color: #0b0c10;
+    font-size: 14px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: transform 0.2s, filter 0.2s, box-shadow 0.2s;
+}
+
+.reward-close-btn:hover {
+    filter: brightness(1.08);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(255, 208, 0, 0.4);
+}
+
+/* =======================================================
+   Mobile Components Defaults (Hidden on Desktop)
+   ======================================================= */
+.mobile-header,
+.mobile-nav-bar,
+.mobile-hero-actions,
+.mobile-section2-actions,
+.mobile-lang-sheet {
+    display: none;
+}
+
+/* =======================================================
+   Mobile Chrome & Touch Device Responsiveness (<= 768px)
+   ======================================================= */
+@media screen and (max-width: 768px) {
+    body {
+        align-items: stretch;
+        background-color: #0c0d10;
+        -webkit-text-size-adjust: 100%;
+        -webkit-tap-highlight-color: transparent;
+        touch-action: manipulation;
+    }
+
+    .site-container {
+        width: 100%;
+        max-width: 100%;
+        min-height: auto;
+    }
+
+    /* Hide mobile-only duplicate controls — keep desktop hotspots on artwork */
+    .mobile-header,
+    .mobile-nav-bar,
+    .mobile-hero-actions,
+    .mobile-section2-actions {
+        display: none !important;
+    }
+
+    /* Section Aspect & Dimensions on Mobile */
+    .page-section {
+        flex-direction: column;
+    }
+
+    .hero-wrapper,
+    .scroll-wrapper {
+        width: 100%;
+        max-width: 100%;
+        aspect-ratio: 1024 / 550;
+        max-height: none;
+        border-radius: 0;
+        box-shadow: none;
+    }
+
+    .scroll-wrapper {
+        aspect-ratio: 1024 / 570;
+    }
+
+
+    /* Mobile Language Bottom Sheet */
+    .mobile-lang-sheet {
+        display: flex;
+        flex-direction: column;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: #14171f;
+        border-top: 2px solid #ffd000;
+        border-radius: 20px 20px 0 0;
+        padding: 20px 18px 32px;
+        z-index: 1002;
+        max-height: 82vh;
+        box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.9);
+        transform: translateY(100%);
+        transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .mobile-lang-sheet.show {
+        transform: translateY(0);
+    }
+
+    .lang-sheet-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-bottom: 12px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        margin-bottom: 12px;
+    }
+
+    .lang-sheet-header h3 {
+        font-size: 17px;
+        font-weight: 800;
+        color: #ffd000;
+        letter-spacing: 0.5px;
+    }
+
+    .close-sheet-btn {
+        background: transparent;
+        border: none;
+        color: #8e94a5;
+        font-size: 26px;
+        cursor: pointer;
+        padding: 4px;
+    }
+
+    .lang-sheet-list {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        padding-bottom: 10px;
+    }
+
+    .lang-sheet-item {
+        display: flex;
+        align-items: center;
+        padding: 12px 14px;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        border-radius: 10px;
+        color: #ffffff;
+        font-size: 15px;
+        font-weight: 700;
+        cursor: pointer;
+        gap: 12px;
+        text-align: left;
+    }
+
+    .lang-sheet-item.active {
+        background: rgba(255, 208, 0, 0.14);
+        border-color: #ffd000;
+        color: #ffd000;
+    }
+
+    .sheet-emoji {
+        font-size: 20px;
+    }
+
+    .sheet-name {
+        flex: 1;
+    }
+
+    .sheet-check {
+        font-size: 16px;
+        font-weight: 900;
+        color: #ffd000;
+    }
+
+    /* Modals Responsive Handling for Mobile Chrome */
+    .login-box {
+        width: 94%;
+        max-width: 400px;
+        padding: 28px 20px 24px;
+        max-height: 92vh;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .close-modal {
+        top: 10px;
+        right: 10px;
+        width: 44px;
+        height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 28px;
+    }
+
+    .login-box h2 {
+        font-size: 20px;
+    }
+
+    .modal-header p {
+        font-size: 12px;
+    }
+
+    /* font-size: 16px strictly prevents Chrome Mobile zooming in on focus */
+    .input-box input {
+        height: 50px;
+        font-size: 16px !important;
+        border-radius: 10px;
+    }
+
+    .submit-btn {
+        height: 50px;
+        font-size: 14px;
+        border-radius: 10px;
+    }
+
+    .reward-popup {
+        width: 94%;
+        max-width: 420px;
+        padding: 26px 18px 22px;
+        max-height: 92vh;
+        overflow-y: auto;
+    }
+
+    .reward-popup h2 {
+        font-size: 21px;
+    }
+
+    .reward-popup .reward-amount {
+        font-size: 14px;
+    }
+
+    .balance-bar {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+        text-align: center;
+    }
+
+    .balance-left {
+        align-items: center;
+    }
+
+    .refill-btn {
+        justify-content: center;
+        height: 42px;
+        font-size: 13px;
+    }
+
+    .balance-right {
+        text-align: center;
+    }
+}

