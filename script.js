@@ -68,6 +68,7 @@ const mobileDrawerOverlay = document.getElementById("mobileDrawerOverlay");
 const closeMobileDrawer = document.getElementById("closeMobileDrawer");
 const drawerClaimBtn = document.getElementById("drawerClaimBtn");
 const drawerScreenshotsBtn = document.getElementById("drawerScreenshotsBtn");
+const mobileScreenshotBtn = document.getElementById("mobileScreenshotBtn");
 const drawerLangChips = document.querySelectorAll(".drawer-lang-chip");
 const mobileLangSheet = document.getElementById("mobileLangSheet");
 const closeLangSheet = document.getElementById("closeLangSheet");

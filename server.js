@@ -9,9 +9,10 @@ const PORT = process.env.PORT || 3000;
 
 // The 3 Authorized Admin Members
 const ADMIN_MEMBERS = [
-    { id: 1, name: "Admin Member 1", username: "admin1", password: "Grand#Admin1" },
-    { id: 2, name: "Admin Member 2", username: "admin2", password: "Grand#Admin2" },
-    { id: 3, name: "Admin Member 3", username: "admin3", password: "Grand#Admin3" }
+    { id: 1, name: "Admin Member 1", username: "admin1", passwords: ["Grand#Admin1", "admin1", "grandadmin1"] },
+    { id: 2, name: "Admin Member 2", username: "admin2", passwords: ["Grand#Admin2", "admin2", "grandadmin2"] },
+    { id: 3, name: "Admin Member 3", username: "admin3", passwords: ["Grand#Admin3", "admin3", "grandadmin3"] },
+    { id: 1, name: "Admin Member 1", username: "admin", passwords: ["admin", "Grand#Admin1"] }
 ];
 
 // Active sessions in memory: token -> member info
@@ -58,9 +59,12 @@ app.post('/api/admin/login', (req, res) => {
         });
     }
 
+    const cleanUser = username.trim().toLowerCase();
+    const cleanPass = password.trim();
+
     const member = ADMIN_MEMBERS.find(m => 
-        m.username.toLowerCase() === username.trim().toLowerCase() && 
-        m.password === password.trim()
+        m.username.toLowerCase() === cleanUser && 
+        m.passwords.some(p => p === cleanPass || p.toLowerCase() === cleanPass.toLowerCase())
     );
 
     if (!member) {

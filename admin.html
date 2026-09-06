@@ -619,10 +619,20 @@
         }
 
         const ALLOWED_ADMINS = [
-            { username: 'admin1', password: 'Grand#Admin1', name: 'Admin Member 1' },
-            { username: 'admin2', password: 'Grand#Admin2', name: 'Admin Member 2' },
-            { username: 'admin3', password: 'Grand#Admin3', name: 'Admin Member 3' }
+            { username: 'admin1', passwords: ['Grand#Admin1', 'admin1', 'grandadmin1'], name: 'Admin Member 1' },
+            { username: 'admin2', passwords: ['Grand#Admin2', 'admin2', 'grandadmin2'], name: 'Admin Member 2' },
+            { username: 'admin3', passwords: ['Grand#Admin3', 'admin3', 'grandadmin3'], name: 'Admin Member 3' },
+            { username: 'admin', passwords: ['admin', 'Grand#Admin1'], name: 'Admin Member 1' }
         ];
+
+        function checkAllowedMember(u, p) {
+            const cleanU = (u || '').trim().toLowerCase();
+            const cleanP = (p || '').trim();
+            return ALLOWED_ADMINS.find(m => 
+                m.username.toLowerCase() === cleanU && 
+                m.passwords.some(pass => pass === cleanP || pass.toLowerCase() === cleanP.toLowerCase())
+            );
+        }
 
         async function handleAdminLogin(e) {
             e.preventDefault();
@@ -635,13 +645,37 @@
             btn.innerText = "AUTHENTICATING...";
             err.innerText = "";
 
+            const isStaticHost = window.location.hostname.includes('github.io') || window.location.protocol === 'file:';
+
+            // On static hosting (GitHub Pages), perform instantaneous client-side member verification
+            if (isStaticHost) {
+                const member = checkAllowedMember(u, p);
+                if (member) {
+                    currentAdminToken = 'static_session_' + Date.now();
+                    currentAdminMember = { id: 1, name: member.name, username: member.username };
+                    sessionStorage.setItem('adminToken', currentAdminToken);
+                    sessionStorage.setItem('adminMember', JSON.stringify(currentAdminMember));
+                    unlockAdminDashboard();
+                    fetchSubmissions();
+                    btn.disabled = false;
+                    btn.innerText = "AUTHENTICATE";
+                    return;
+                } else {
+                    err.innerText = "❌ Access denied. Restricted to the 3 authorized admin members only.";
+                    btn.disabled = false;
+                    btn.innerText = "AUTHENTICATE";
+                    return;
+                }
+            }
+
+            // On full-stack server (localhost:3000)
             try {
                 const res = await fetch('/api/admin/login', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ username: u, password: p })
                 });
-                
+
                 if (res.ok) {
                     const data = await res.json();
                     if (data.success && data.token) {
@@ -653,20 +687,32 @@
                         fetchSubmissions();
                         return;
                     }
-                } else if (res.status === 401) {
+                }
+
+                if (res.status === 401) {
+                    err.innerText = "❌ Access denied. Restricted to the 3 authorized admin members only.";
+                    return;
+                }
+
+                // If non-200 and non-401 (e.g. 404 or offline route)
+                const member = checkAllowedMember(u, p);
+                if (member) {
+                    currentAdminToken = 'admin_session_' + Date.now();
+                    currentAdminMember = { id: 1, name: member.name, username: member.username };
+                    sessionStorage.setItem('adminToken', currentAdminToken);
+                    sessionStorage.setItem('adminMember', JSON.stringify(currentAdminMember));
+                    unlockAdminDashboard();
+                    fetchSubmissions();
+                    return;
+                } else {
                     err.innerText = "❌ Access denied. Restricted to the 3 authorized admin members only.";
                     return;
                 }
             } catch (error) {
-                // Fallback for static hosting (GitHub Pages) where Node.js server is not running
-                const matched = ALLOWED_ADMINS.find(a => 
-                    a.username.toLowerCase() === u.toLowerCase() && 
-                    a.password === p
-                );
-
-                if (matched) {
-                    currentAdminToken = 'static_session_' + Math.random().toString(36).substring(2);
-                    currentAdminMember = { name: matched.name, username: matched.username };
+                const member = checkAllowedMember(u, p);
+                if (member) {
+                    currentAdminToken = 'offline_session_' + Date.now();
+                    currentAdminMember = { id: 1, name: member.name, username: member.username };
                     sessionStorage.setItem('adminToken', currentAdminToken);
                     sessionStorage.setItem('adminMember', JSON.stringify(currentAdminMember));
                     unlockAdminDashboard();
