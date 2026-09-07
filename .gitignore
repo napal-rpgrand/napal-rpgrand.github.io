@@ -1,4 +1,10 @@
 node_modules/
 npm-debug.log
 .DS_Store
+
+# Database — contains real user data, never commit
 database.sqlite
+
+# Environment secrets — contains passwords and webhook URLs
+.env
+

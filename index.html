@@ -3,7 +3,8 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#0c0d10">
     <title>GRND - Free Grand Coins Claim</title>
     <link rel="stylesheet" href="style.css">
 </head>
@@ -39,7 +40,7 @@
         <!-- Main Hero Section (Section 1) -->
         <section class="page-section hero-section" id="heroSection">
             <div class="artwork-wrapper hero-wrapper" id="heroWrapper">
-                <img src="download.jpg" alt="Grand Mobile Open World" class="artwork-img hero-bg" id="heroBg">
+                <img src="download.jpg" alt="Grand Mobile Open World" class="artwork-img hero-bg" id="heroBg" fetchpriority="high">
 
                 <!-- Desktop Interactive Hotspots -->
                 <button type="button" class="hotspot-btn nav-btn btn-screenshot" id="screenshotBtn"
@@ -91,7 +92,7 @@
         <section class="page-section section2-section" id="section2Section">
             <div class="artwork-wrapper section2-wrapper" id="section2Wrapper">
                 <img src="section2.png" alt="It's up to you what you want to be" class="artwork-img section2-bg"
-                    id="section2Bg">
+                    id="section2Bg" loading="lazy">
 
                 <!-- Hotspot for CREATE ONESELF button -->
                 <button type="button" class="hotspot-btn btn-create-oneself" id="createOneselfBtn"
@@ -103,7 +104,7 @@
         <section class="page-section section3-section" id="scrollSection">
             <div class="artwork-wrapper section3-wrapper" id="scrollWrapper">
                 <img src="section3.jpg" alt="Customize Character and Garage" class="artwork-img scroll-bg"
-                    id="scrollBg">
+                    id="scrollBg" loading="lazy">
 
                 <!-- Hotspot for CREATE CHARACTER button -->
                 <button type="button" class="hotspot-btn btn-create-character" id="createCharacterBtn"
@@ -115,7 +116,7 @@
         <section class="page-section section4-section" id="section4Section">
             <div class="artwork-wrapper section4-wrapper" id="section4Wrapper">
                 <img src="section4.png" alt="Join now and get rare set" class="artwork-img section4-bg"
-                    id="section4Bg">
+                    id="section4Bg" loading="lazy">
 
                 <!-- Hotspots for CREATE ACCOUNT buttons -->
                 <button type="button" class="hotspot-btn btn-create-account-top" id="createAccountTopBtn"
@@ -124,6 +125,14 @@
                     title="Create Account / Login to Claim" aria-label="Create Account"></button>
             </div>
         </section>
+
+        <!-- Dot Navigation (section indicators) -->
+        <nav class="dot-nav" id="dotNav" aria-label="Page sections">
+            <button class="dot-nav-item active" aria-label="Section 1: Hero"></button>
+            <button class="dot-nav-item" aria-label="Section 2: Create Oneself"></button>
+            <button class="dot-nav-item" aria-label="Section 3: Customize"></button>
+            <button class="dot-nav-item" aria-label="Section 4: Join Now"></button>
+        </nav>
 
         <!-- Modal Backdrop -->
         <div class="modal-backdrop" id="modalBackdrop"></div>

