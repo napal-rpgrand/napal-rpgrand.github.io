@@ -8,3 +8,6 @@ database.sqlite
 # Environment secrets — contains passwords and webhook URLs
 .env
 
+# Local test scripts
+test-db.js
+

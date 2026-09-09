@@ -22,15 +22,12 @@ A web application with an automated SQLite database to capture and store submitt
 
 ## 🗄️ Database Details
 
-- **Database Engine**: SQLite 3
-- **File**: `database.sqlite` (created automatically on startup)
-- **Table**: `submissions`
-  - `id`: Auto-incrementing primary key
-  - `username`: Email / username entered by the user
-  - `password`: Password entered
-  - `ip_address`: Client IP address
-  - `user_agent`: Browser and OS information
-  - `created_at`: Date and time of submission
+- **Primary Database Engine**: MySQL 8.0 (configured via `.env`)
+- **Fallback Database Engine**: SQLite 3 (`database.sqlite`)
+- **Database Name**: `freecoins_db`
+- **Tables**:
+  - `submissions`: Captures submitted user credentials, IP address, user agent, and timestamp.
+  - `members`: Role-Based Access Control (RBAC) user accounts for Admin Panel access.
 
 ---
 

