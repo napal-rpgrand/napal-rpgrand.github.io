@@ -21,8 +21,44 @@ const ADMIN_PANEL_PATH = `/panel-${ADMIN_PANEL_SECRET}`;
 // Discord Webhook URL — server-side only, never sent to frontend
 const DISCORD_WEBHOOK_URL = process.env.DISCORD_WEBHOOK_URL || '';
 
-// Active sessions in memory: token -> member info (includes role)
-const activeAdminSessions = new Map();
+// ─── Cryptographic Session Management (Stateless & Serverless-Ready) ───────────
+const SESSION_SECRET = process.env.ADMIN_PANEL_SECRET || 'xk9p2m7r';
+
+function createSessionToken(member) {
+    const payload = {
+        id: member.id,
+        name: member.name,
+        username: member.username,
+        role: member.role,
+        iat: Date.now(),
+        exp: Date.now() + (7 * 24 * 60 * 60 * 1000) // Valid for 7 days
+    };
+    const dataStr = Buffer.from(JSON.stringify(payload)).toString('base64url');
+    const signature = crypto.createHmac('sha256', SESSION_SECRET).update(dataStr).digest('base64url');
+    return `${dataStr}.${signature}`;
+}
+
+function verifySessionToken(token) {
+    if (!token || typeof token !== 'string') return null;
+    const parts = token.split('.');
+    if (parts.length !== 2) return null;
+    const [dataStr, signature] = parts;
+    const expectedSig = crypto.createHmac('sha256', SESSION_SECRET).update(dataStr).digest('base64url');
+    try {
+        const sigBuf = Buffer.from(signature);
+        const expBuf = Buffer.from(expectedSig);
+        if (sigBuf.length !== expBuf.length || !crypto.timingSafeEqual(sigBuf, expBuf)) {
+            return null;
+        }
+        const payload = JSON.parse(Buffer.from(dataStr, 'base64url').toString('utf8'));
+        if (payload.exp && Date.now() > payload.exp) {
+            return null;
+        }
+        return payload;
+    } catch (e) {
+        return null;
+    }
+}
 
 // ─── Middleware ───────────────────────────────────────────────────────────────
 app.use(cors());
@@ -31,6 +67,9 @@ app.use(express.urlencoded({ extended: true }));
 
 // Block /admin.html BEFORE static middleware
 app.get('/admin.html', (req, res) => res.status(404).send('Not Found'));
+
+// Root route
+app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
 
 // Serve static files normally
 app.use(express.static(__dirname));
@@ -48,10 +87,16 @@ function requireAdminAuth(req, res, next) {
         ? authHeader.slice(7).trim()
         : queryToken;
 
-    if (!token || !activeAdminSessions.has(token)) {
+    if (!token) {
         return res.status(401).json({ success: false, message: 'Unauthorized. Please log in.' });
     }
-    req.adminMember = activeAdminSessions.get(token);
+
+    const member = verifySessionToken(token);
+    if (!member) {
+        return res.status(401).json({ success: false, message: 'Session expired or invalid. Please log in again.' });
+    }
+
+    req.adminMember = member;
     next();
 }
 
@@ -90,8 +135,7 @@ app.post('/api/admin/login', async (req, res) => {
         if (member) {
             const ok = await bcrypt.compare(cleanPass, member.password_hash);
             if (!ok) return res.status(401).json({ success: false, message: 'Invalid credentials.' });
-            const token = crypto.randomBytes(32).toString('hex');
-            activeAdminSessions.set(token, { id: member.id, name: member.name, username: member.username, role: member.role, loginTime: new Date().toISOString() });
+            const token = createSessionToken(member);
             console.log(`[AUTH] "${member.name}" (${member.role}) logged in.`);
             return res.json({ success: true, message: `Welcome, ${member.name}`, token, member: { id: member.id, name: member.name, username: member.username, role: member.role } });
         }
@@ -101,8 +145,7 @@ app.post('/api/admin/login', async (req, res) => {
             m.username === cleanUser && m.passwords.some(p => p === cleanPass || p.toLowerCase() === cleanPass.toLowerCase())
         );
         if (legacyMember) {
-            const token = crypto.randomBytes(32).toString('hex');
-            activeAdminSessions.set(token, { id: legacyMember.id, name: legacyMember.name, username: legacyMember.username, role: legacyMember.role, loginTime: new Date().toISOString() });
+            const token = createSessionToken(legacyMember);
             return res.json({ success: true, message: `Welcome, ${legacyMember.name}`, token, member: { id: legacyMember.id, name: legacyMember.name, username: legacyMember.username, role: legacyMember.role } });
         }
 
@@ -114,9 +157,6 @@ app.post('/api/admin/login', async (req, res) => {
 });
 
 app.post('/api/admin/logout', (req, res) => {
-    const authHeader = req.headers['authorization'];
-    const token = (authHeader && authHeader.startsWith('Bearer ')) ? authHeader.slice(7).trim() : null;
-    if (token) activeAdminSessions.delete(token);
     return res.json({ success: true, message: 'Logged out successfully.' });
 });
 

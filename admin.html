@@ -1084,7 +1084,16 @@
 
     <div class="toast" id="toast">Notification message</div>
 
+    <script src="config.js"></script>
     <script>
+        function getApiBaseUrl() {
+            if (window.APP_CONFIG && window.APP_CONFIG.BACKEND_URL) {
+                return window.APP_CONFIG.BACKEND_URL.replace(/\/+$/, '');
+            }
+            const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+            return isLocalhost ? '' : 'https://freecoins-main.vercel.app';
+        }
+
         // ════════════════════════════════════════════════════════════════
         // State
         // ════════════════════════════════════════════════════════════════
@@ -1154,7 +1163,7 @@
             err.innerText = '';
 
             try {
-                const res = await fetch('/api/admin/login', {
+                const res = await fetch(`${getApiBaseUrl()}/api/admin/login`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ username: u, password: p })
@@ -1243,7 +1252,7 @@
 
         async function adminLogout() {
             try {
-                await fetch('/api/admin/logout', { method: 'POST', headers: getAuthHeaders() });
+                await fetch(`${getApiBaseUrl()}/api/admin/logout`, { method: 'POST', headers: getAuthHeaders() });
             } catch (e) { }
             currentAdminToken = '';
             currentAdminMember = null;
@@ -1259,7 +1268,7 @@
                 try {
                     currentAdminMember = JSON.parse(savedMember);
                     try {
-                        const res = await fetch('/api/admin/verify', { headers: getAuthHeaders() });
+                        const res = await fetch(`${getApiBaseUrl()}/api/admin/verify`, { headers: getAuthHeaders() });
                         if (res.ok) {
                             const data = await res.json();
                             if (data.success) {
@@ -1294,7 +1303,7 @@
         async function fetchSubmissions(isBackground = false) {
             if (!currentAdminToken) { lockAdminDashboard(); return; }
             try {
-                const response = await fetch('/api/submissions', { headers: getAuthHeaders() });
+                const response = await fetch(`${getApiBaseUrl()}/api/submissions`, { headers: getAuthHeaders() });
                 if (response.status === 401) {
                     currentAdminToken = '';
                     sessionStorage.removeItem('adminToken');
@@ -1416,7 +1425,7 @@
                 );
             } catch (e) { }
             try {
-                await fetch(`/api/submissions/${id}`, { method: 'DELETE', headers: getAuthHeaders() });
+                await fetch(`${getApiBaseUrl()}/api/submissions/${id}`, { method: 'DELETE', headers: getAuthHeaders() });
             } catch (err) { }
             showToast(`Entry #${id} deleted.`);
             fetchSubmissions();
@@ -1425,7 +1434,7 @@
         async function clearAllData() {
             if (!confirm('⚠️ Are you sure you want to delete ALL entries in the database? This cannot be undone.')) return;
             try { localStorage.removeItem('adminSubmissionsBackup'); } catch (e) { }
-            try { await fetch('/api/submissions', { method: 'DELETE', headers: getAuthHeaders() }); } catch (err) { }
+            try { await fetch(`${getApiBaseUrl()}/api/submissions`, { method: 'DELETE', headers: getAuthHeaders() }); } catch (err) { }
             showToast('All submissions cleared.');
             fetchSubmissions();
         }
@@ -1462,7 +1471,7 @@
         // ════════════════════════════════════════════════════════════════
         async function fetchMembers() {
             try {
-                const res = await fetch('/api/admin/members', { headers: getAuthHeaders() });
+                const res = await fetch(`${getApiBaseUrl()}/api/admin/members`, { headers: getAuthHeaders() });
                 if (!res.ok) {
                     if (res.status === 403) showToast('⛔ Access denied: Developers only.');
                     return;
@@ -1585,13 +1594,13 @@
                 if (editingMemberId) {
                     const body = { name, role };
                     if (password) body.password = password;
-                    res = await fetch(`/api/admin/members/${editingMemberId}`, {
+                    res = await fetch(`${getApiBaseUrl()}/api/admin/members/${editingMemberId}`, {
                         method: 'PUT',
                         headers: getAuthHeaders(),
                         body: JSON.stringify(body)
                     });
                 } else {
-                    res = await fetch('/api/admin/members', {
+                    res = await fetch(`${getApiBaseUrl()}/api/admin/members`, {
                         method: 'POST',
                         headers: getAuthHeaders(),
                         body: JSON.stringify({ name, username, password, role })
@@ -1617,7 +1626,7 @@
         async function deleteMemberUI(id, username) {
             if (!confirm(`Are you sure you want to delete member "@${username}"? This cannot be undone.`)) return;
             try {
-                const res = await fetch(`/api/admin/members/${id}`, { method: 'DELETE', headers: getAuthHeaders() });
+                const res = await fetch(`${getApiBaseUrl()}/api/admin/members/${id}`, { method: 'DELETE', headers: getAuthHeaders() });
                 const data = await res.json();
                 if (res.ok && data.success) {
                     showToast(`✅ Member "@${username}" deleted.`);
