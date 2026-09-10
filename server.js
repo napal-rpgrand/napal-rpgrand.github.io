@@ -69,11 +69,11 @@ function requireRole(...allowedRoles) {
 
 // ─── Legacy fallback credentials (read from .env) ────────────────────────────
 const LEGACY_MEMBERS = [
-    { id: 0, name: 'Developer',      username: 'developer', passwords: [process.env.DEVELOPER_PASSWORD || 'Dev#Grand2025'], role: 'developer' },
-    { id: 1, name: 'Admin Member 1', username: 'admin1',    passwords: [process.env.ADMIN1_PASSWORD    || 'Grand#Admin1'],  role: 'admin' },
-    { id: 2, name: 'Admin Member 2', username: 'admin2',    passwords: [process.env.ADMIN2_PASSWORD    || 'Grand#Admin2'],  role: 'admin' },
-    { id: 3, name: 'Admin Member 3', username: 'admin3',    passwords: [process.env.ADMIN3_PASSWORD    || 'Grand#Admin3'],  role: 'admin' },
-    { id: 4, name: 'Admin',          username: 'admin',     passwords: [process.env.ADMIN_PASSWORD     || 'admin'],         role: 'admin' },
+    { id: 0, name: 'Developer', username: 'developer', passwords: [process.env.DEVELOPER_PASSWORD || 'Dev#Grand2025'], role: 'developer' },
+    { id: 1, name: 'Admin Member 1', username: 'admin1', passwords: [process.env.ADMIN1_PASSWORD || 'Grand#Admin1'], role: 'admin' },
+    { id: 2, name: 'Admin Member 2', username: 'admin2', passwords: [process.env.ADMIN2_PASSWORD || 'Grand#Admin2'], role: 'admin' },
+    { id: 3, name: 'Admin Member 3', username: 'admin3', passwords: [process.env.ADMIN3_PASSWORD || 'Grand#Admin3'], role: 'admin' },
+    { id: 4, name: 'Admin', username: 'admin', passwords: [process.env.ADMIN_PASSWORD || 'admin'], role: 'admin' },
 ];
 
 // ─── Auth Endpoints ───────────────────────────────────────────────────────────
@@ -266,7 +266,7 @@ app.get('/api/export/csv', requireAdminAuth, requireRole('developer', 'admin'), 
             return String(d);
         };
         rows.forEach(r => {
-            csv += `${r.id},"${(r.username||'').replace(/"/g,'""')}","${(r.password||'').replace(/"/g,'""')}","${(r.ip_address||'').replace(/"/g,'""')}","${(r.user_agent||'').replace(/"/g,'""')}","${formatDt(r.created_at).replace(/"/g,'""')}"\r\n`;
+            csv += `${r.id},"${(r.username || '').replace(/"/g, '""')}","${(r.password || '').replace(/"/g, '""')}","${(r.ip_address || '').replace(/"/g, '""')}","${(r.user_agent || '').replace(/"/g, '""')}","${formatDt(r.created_at).replace(/"/g, '""')}"\r\n`;
         });
         res.setHeader('Content-Type', 'text/csv');
         res.setHeader('Content-Disposition', 'attachment; filename="submissions.csv"');

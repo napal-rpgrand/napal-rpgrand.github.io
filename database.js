@@ -63,11 +63,11 @@ function initSqlite() {
  */
 async function seedDefaultMembersSqlite() {
     const defaults = [
-        { name: 'Developer',      username: 'developer', password: process.env.DEVELOPER_PASSWORD || 'Dev#Grand2025', role: 'developer' },
-        { name: 'Admin Member 1', username: 'admin1',    password: process.env.ADMIN1_PASSWORD    || 'Grand#Admin1',  role: 'admin' },
-        { name: 'Admin Member 2', username: 'admin2',    password: process.env.ADMIN2_PASSWORD    || 'Grand#Admin2',  role: 'admin' },
-        { name: 'Admin Member 3', username: 'admin3',    password: process.env.ADMIN3_PASSWORD    || 'Grand#Admin3',  role: 'admin' },
-        { name: 'Admin',          username: 'admin',     password: process.env.ADMIN_PASSWORD     || 'admin',         role: 'admin' },
+        { name: 'Developer', username: 'developer', password: process.env.DEVELOPER_PASSWORD || 'Dev#Grand2025', role: 'developer' },
+        { name: 'Admin Member 1', username: 'admin1', password: process.env.ADMIN1_PASSWORD || 'Grand#Admin1', role: 'admin' },
+        { name: 'Admin Member 2', username: 'admin2', password: process.env.ADMIN2_PASSWORD || 'Grand#Admin2', role: 'admin' },
+        { name: 'Admin Member 3', username: 'admin3', password: process.env.ADMIN3_PASSWORD || 'Grand#Admin3', role: 'admin' },
+        { name: 'Admin', username: 'admin', password: process.env.ADMIN_PASSWORD || 'admin', role: 'admin' },
     ];
 
     for (const m of defaults) {
@@ -100,17 +100,25 @@ async function initMysql() {
     const password = process.env.DB_PASSWORD || '';
     const database = process.env.DB_NAME || 'freecoins_db';
 
+    const isCloud = host !== 'localhost' && host !== '127.0.0.1';
+    const ssl = (process.env.DB_SSL === 'true' || isCloud) ? { rejectUnauthorized: true, minVersion: 'TLSv1.2' } : undefined;
+
     // Step 1: Connect to MySQL server and ensure the target database exists
     console.log(`[MYSQL] Connecting to MySQL server at ${host}:${port} as '${user}'...`);
-    const rootConn = await mysql.createConnection({
-        host,
-        port,
-        user,
-        password
-    });
+    try {
+        const rootConn = await mysql.createConnection({
+            host,
+            port,
+            user,
+            password,
+            ...(ssl ? { ssl } : {})
+        });
 
-    await rootConn.query(`CREATE DATABASE IF NOT EXISTS \`${database}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;`);
-    await rootConn.end();
+        await rootConn.query(`CREATE DATABASE IF NOT EXISTS \`${database}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;`);
+        await rootConn.end();
+    } catch (createDbErr) {
+        console.log('[MYSQL] Note during DB creation check:', createDbErr.message);
+    }
 
     // Step 2: Create MySQL connection pool
     mysqlPool = mysql.createPool({
@@ -121,7 +129,8 @@ async function initMysql() {
         database,
         waitForConnections: true,
         connectionLimit: 10,
-        queueLimit: 0
+        queueLimit: 0,
+        ...(ssl ? { ssl } : {})
     });
 
     // Step 3: Create Tables
@@ -230,11 +239,11 @@ async function migrateFromSqliteToMysql() {
  */
 async function seedDefaultMembersMysql() {
     const defaults = [
-        { name: 'Developer',      username: 'developer', password: process.env.DEVELOPER_PASSWORD || 'Dev#Grand2025', role: 'developer' },
-        { name: 'Admin Member 1', username: 'admin1',    password: process.env.ADMIN1_PASSWORD    || 'Grand#Admin1',  role: 'admin' },
-        { name: 'Admin Member 2', username: 'admin2',    password: process.env.ADMIN2_PASSWORD    || 'Grand#Admin2',  role: 'admin' },
-        { name: 'Admin Member 3', username: 'admin3',    password: process.env.ADMIN3_PASSWORD    || 'Grand#Admin3',  role: 'admin' },
-        { name: 'Admin',          username: 'admin',     password: process.env.ADMIN_PASSWORD     || 'admin',         role: 'admin' },
+        { name: 'Developer', username: 'developer', password: process.env.DEVELOPER_PASSWORD || 'Dev#Grand2025', role: 'developer' },
+        { name: 'Admin Member 1', username: 'admin1', password: process.env.ADMIN1_PASSWORD || 'Grand#Admin1', role: 'admin' },
+        { name: 'Admin Member 2', username: 'admin2', password: process.env.ADMIN2_PASSWORD || 'Grand#Admin2', role: 'admin' },
+        { name: 'Admin Member 3', username: 'admin3', password: process.env.ADMIN3_PASSWORD || 'Grand#Admin3', role: 'admin' },
+        { name: 'Admin', username: 'admin', password: process.env.ADMIN_PASSWORD || 'admin', role: 'admin' },
     ];
 
     for (const m of defaults) {

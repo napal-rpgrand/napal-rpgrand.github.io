@@ -1,14 +1,13 @@
 // ============================================================
 // FreeCoins — Deployment API Configuration
 // ============================================================
-// When running locally on http://localhost:3000, BACKEND_URL is empty
-// and uses local relative routes automatically.
-//
-// When deployed on GitHub Pages (e.g. napal-rpgrand.github.io),
-// set your public backend server URL below (Render, Railway, or tunnel),
-// or configure it directly in the Admin Panel settings.
+// On localhost: uses local relative routes ('').
+// On GitHub Pages or external domains: connects directly to the
+// live Vercel backend (connected to TiDB Cloud MySQL).
 // ============================================================
 
+const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+
 window.APP_CONFIG = {
-    BACKEND_URL: localStorage.getItem('BACKEND_API_URL') || ''
+    BACKEND_URL: localStorage.getItem('BACKEND_API_URL') || (isLocalhost ? '' : 'https://freecoins-main.vercel.app')
 };

